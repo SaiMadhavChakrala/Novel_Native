@@ -1,0 +1,88 @@
+.container {
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+  }
+  
+  .hero {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .hero h1 {
+    font-size: 2.5rem;
+    margin: 1rem 0 0.5rem;
+  }
+  
+  .hero p {
+    font-size: 1.1rem;
+    color: #555;
+  }
+  
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .card {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  
+  .card p {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  .card h2 {
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    color: #03346E;
+  }
+  
+  .button, .buttonOutline {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .button {
+    background-color: #03346E;
+    color: white;
+  }
+  
+  .button:hover {
+    background-color: #1a4e9c;
+  }
+  
+  .buttonOutline {
+    border: 2px solid #03346E;
+    color: #03346E;
+  }
+  
+  .buttonOutline:hover {
+    background-color: #03346E;
+    color: white;
+  }
+  
+  .footer {
+    margin-top: auto;
+    padding: 2rem 0 1rem;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
