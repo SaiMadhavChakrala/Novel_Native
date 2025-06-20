@@ -1,12 +1,14 @@
 import Image from 'next/image';
 import styles from './styles/Home.module.css';
 
+const site_name: string = "WebNovelHub";
+
 export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.hero}>
         {/* <Image src="/logo.svg" alt="Logo" width={80} height={80} /> */}
-        <h1>Welcome to WebNovelHub</h1>
+        <h1>Welcome to {site_name}</h1>
         <p>Your platform to read and write engaging web novels.</p>
       </header>
 
@@ -25,7 +27,7 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        © {new Date().getFullYear()} WebNovelHub. All rights reserved.
+        © {new Date().getFullYear()} {site_name}. All rights reserved.
       </footer>
     </div>
   );
