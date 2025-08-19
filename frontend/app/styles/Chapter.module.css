@@ -1,0 +1,85 @@
+.container {
+  min-height: 100vh;
+  background: #0d1117;
+  color: #f0f0f0;
+  padding: 2rem;
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: #58a6ff;
+}
+
+.content {
+  background: #161b22;
+  padding: 2rem;
+  border-radius: 12px;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #c9d1d9;
+  margin-bottom: 2rem;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.button, .buttonOutline, .buttonSmall {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.button {
+  background: #03346E;
+  color: white;
+}
+
+.button:hover {
+  background: #1a4e9c;
+}
+
+.buttonOutline {
+  border: 2px solid #03346E;
+  color: #58a6ff;
+}
+
+.buttonOutline:hover {
+  background: #03346E;
+  color: white;
+}
+
+.buttonSmall {
+  font-size: 0.9rem;
+  background: #21262d;
+  border: 1px solid #444;
+  color: #ddd;
+}
+
+.buttonSmall:hover {
+  background: #2d333b;
+}
+
+.bookmark {
+  font-size: 0.9rem;
+  color: #aaa;
+}

@@ -1,0 +1,96 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: #0d1117;
+  color: #f0f0f0;
+  font-family: sans-serif;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  color: #58a6ff;
+}
+
+.meta {
+  font-size: 1rem;
+  color: #aaa;
+  margin-bottom: 1rem;
+}
+
+.description {
+  max-width: 700px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+  color: #c9d1d9;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.button, .buttonOutline {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.button {
+  background: #03346E;
+  color: white;
+}
+
+.button:hover {
+  background: #1a4e9c;
+}
+
+.buttonOutline {
+  border: 2px solid #03346E;
+  color: #58a6ff;
+}
+
+.buttonOutline:hover {
+  background: #03346E;
+  color: white;
+}
+
+.chapterList {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #161b22;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.chapterList h2 {
+  margin-bottom: 1rem;
+  color: #3B82F6;
+}
+
+.chapterList ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chapterList li {
+  margin: 0.5rem 0;
+}
+
+.chapterList a {
+  color: #f0f0f0;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.chapterList a:hover {
+  color: #58a6ff;
+}
