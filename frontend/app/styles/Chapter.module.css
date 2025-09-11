@@ -1,85 +1,225 @@
+/* Container for the background image */
 .container {
-  min-height: 100vh;
-  background: #0d1117;
-  color: #f0f0f0;
-  padding: 2rem;
-  font-family: sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #f0f0f0; /* Use a slightly off-white for text to reduce eye strain */
+}
+
+/* A more dynamic gradient overlay for better atmosphere */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  z-index: 1;
+}
+
+/* Wrapper for all the content, enables scrolling */
+.contentWrapper {
+  position: relative;
+  z-index: 2;
   max-width: 800px;
   margin: 0 auto;
+  padding: 3rem 2rem;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+
+  /* --- Scrollbar styles for Firefox --- */
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; 
 }
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .header h1 {
-  font-size: 2rem;
-  color: #58a6ff;
+  font-size: 3rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 500;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
 }
 
 .content {
-  background: #161b22;
+  flex-grow: 1;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 2rem;
   border-radius: 12px;
-  line-height: 1.8;
-  font-size: 1.1rem;
-  color: #c9d1d9;
   margin-bottom: 2rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+
+  /* 👇 This creates a gap between the text and the scrollbar */
+  margin-right: 1rem;
 }
 
 .footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .navButtons {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.button, .buttonOutline, .buttonSmall {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: bold;
+/* --- BUTTON STYLES --- */
+/* ... (keep your existing button styles) ... */
+
+.button,
+.buttonOutline,
+.buttonSmall {
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
   text-decoration: none;
-  transition: 0.3s;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid transparent;
+  backdrop-filter: blur(5px);
 }
 
 .button {
-  background: #03346E;
+  background-color: rgba(0, 112, 243, 0.8);
   color: white;
 }
-
 .button:hover {
-  background: #1a4e9c;
+  background-color: rgba(0, 112, 243, 1);
 }
 
 .buttonOutline {
-  border: 2px solid #03346E;
-  color: #58a6ff;
-}
-
-.buttonOutline:hover {
-  background: #03346E;
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.buttonOutline:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: white;
 }
 
 .buttonSmall {
+  background-color: transparent;
+  border: none;
+  color: #ccc;
   font-size: 0.9rem;
-  background: #21262d;
-  border: 1px solid #444;
-  color: #ddd;
+  padding: 0.4rem;
 }
-
 .buttonSmall:hover {
-  background: #2d333b;
+  color: white;
 }
 
 .bookmark {
-  font-size: 0.9rem;
-  color: #aaa;
+  color: #ccc;
+}
+
+/* --- 👇 ADD THIS NEW SECTION FOR SCROLLBAR STYLING --- */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+.contentWrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.contentWrapper::-webkit-scrollbar-track {
+  background: transparent; /* Makes the track invisible */
+}
+
+.contentWrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4); /* The draggable part */
+  border-radius: 10px;
+  border: 2px solid transparent; /* Creates padding around thumb */
+  background-clip: content-box;
+}
+
+.contentWrapper::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- DARK READER MODE OVERRIDES --- */
+.plainTextContainer {
+  position: static;
+  height: auto;
+  min-height: 100vh;
+  background-color: #0A192F; /* Midnight Blue Background */
+  color: #E0E6F1; /* Soft, slightly blue-tinted white text */
+}
+
+.plainTextContainer .contentWrapper {
+  height: auto;
+}
+
+.plainTextContainer .header h1 {
+  color: #FFFFFF; /* Brighter white for the title */
+  text-shadow: none;
+}
+
+.plainTextContent {
+  background-color: transparent !important; /* Important to override inline style */
+  backdrop-filter: none;
+  border: none;
+  text-shadow: none;
+}
+
+/* Update button styles for the dark theme */
+.plainTextContainer .button {
+  background-color: rgba(56, 189, 248, 0.8); /* A nice sky blue */
+  color: #0A192F;
+  font-weight: 700;
+}
+.plainTextContainer .button:hover {
+  background-color: rgba(56, 189, 248, 1);
+}
+
+.plainTextContainer .buttonOutline {
+  background-color: transparent;
+  color: #E0E6F1;
+  border-color: rgba(224, 230, 241, 0.5);
+}
+.plainTextContainer .buttonOutline:hover {
+  background-color: rgba(224, 230, 241, 0.1);
+  border-color: #E0E6F1;
+}
+
+.plainTextContainer .buttonSmall,
+.plainTextContainer .bookmark {
+  color: #94A3B8; /* Slate gray color */
+}
+.plainTextContainer .buttonSmall:hover {
+  color: #E0E6F1;
+}
+
+.plainTextContainer .footer {
+  border-top-color: rgba(224, 230, 241, 0.2);
+}
+
+/* Adjust the toggle button for the new dark mode */
+.plainTextContainer .toggleButton {
+  background: rgba(224, 230, 241, 0.1);
+  border-color: rgba(224, 230, 241, 0.2);
+  color: #E0E6F1;
+}
+.plainTextContainer .toggleButton:hover {
+  background: rgba(224, 230, 241, 0.2);
 }

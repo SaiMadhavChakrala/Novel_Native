@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import styles from './styles/Home.module.css';
+import Link from 'next/link';
 
 const site_name: string = "WebNovelHub";
 
@@ -16,7 +17,7 @@ export default function Home() {
         <div className={styles.card}>
           <h2>📚 Browse Novels</h2>
           <p>Explore fantasy, romance, sci-fi, and more. New chapters every day!</p>
-          <a href="/novels" className={styles.button}>Start Reading</a>
+          <Link href="/novels" className={styles.button}>Start Reading</Link>
         </div>
 
         <div className={styles.card}>
