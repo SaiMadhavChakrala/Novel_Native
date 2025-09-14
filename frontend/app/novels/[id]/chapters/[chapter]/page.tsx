@@ -51,13 +51,15 @@ export default function ChapterPage() {
         <header className={styles.header}>
           <h1>Chapter {chapter}: {chapterData.title}</h1>
           {/* 👇 3. Add the toggle button */}
-          <button
+
+          <button 
             onClick={() => setIsPlainText(!isPlainText)}
-            className={styles.toggleButton}
+            className={`${styles.toggleButton} ${isPlainText ? styles.active : ""}`}
             title="Toggle Plain Text Mode"
           >
-            {isPlainText ? "🖼️" : "📖"}
+            {isPlainText ? "View Picture" : "Read only text"}
           </button>
+
         </header>
         
         <article
