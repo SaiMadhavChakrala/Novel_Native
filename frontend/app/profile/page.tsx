@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { signIn, signOut, auth } from "../auth";
 
 export default async function ProfilePage() {
@@ -8,14 +7,6 @@ export default async function ProfilePage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
       {/* Back button */}
-      <div className="absolute top-5 left-5">
-        <Link
-          href="/"
-          className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 transition"
-        >
-          ← Back
-        </Link>
-      </div>
 
       <h1 className="text-3xl font-bold mb-6">Profile</h1>
 
