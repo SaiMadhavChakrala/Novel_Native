@@ -1,6 +1,7 @@
 import { signIn, signOut, auth } from "../auth";
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
+import { syncAuthorIdentity } from "@/app/lib/authorIdentity";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,8 @@ export default async function ProfilePage() {
 
   // If logged in, check if they are in the 'authors' database
   if (session?.user?.id) {
+    await syncAuthorIdentity(session);
+
     const { data } = await supabase
       .from("authors")
       .select("id")

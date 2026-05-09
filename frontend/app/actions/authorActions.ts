@@ -6,6 +6,7 @@ import { supabase } from "@/app/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { GoogleGenAI } from '@google/genai'; // Added missing Gemini import
+import { getSessionAuthorIds, syncAuthorIdentity } from "@/app/lib/authorIdentity";
 
 const MAX_CHAPTER_CONTENT_LENGTH = 8000;
 
@@ -18,13 +19,15 @@ export async function createNovelAction(formData: FormData) {
 
   const userId = session.user.id;
 
+  const migratedAuthor = await syncAuthorIdentity(session);
+
   const { data: author } = await supabase
     .from("authors")
     .select("id")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
-  if (!author) {
+  if (!author && !migratedAuthor) {
     return { error: "Please register as an author first." };
   }
 
@@ -65,6 +68,12 @@ export async function createNovelAction(formData: FormData) {
 export async function registerAuthorAction(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("You must be logged in.");
+
+  const existingAuthor = await syncAuthorIdentity(session);
+
+  if (existingAuthor) {
+    redirect("/author");
+  }
 
   const penName = formData.get("pen_name") as string;
   const bio = formData.get("bio") as string;
@@ -118,6 +127,9 @@ export async function addChapterAction(novelId: string, formData: FormData) {
   if (!session?.user?.id) throw new Error("You must be logged in.");
 
   const userId = session.user.id;
+  const authorIds = getSessionAuthorIds(session);
+
+  await syncAuthorIdentity(session);
 
   const { data: novel, error: novelError } = await supabase
     .from("novels")
@@ -126,7 +138,14 @@ export async function addChapterAction(novelId: string, formData: FormData) {
     .single();
 
   if (novelError || !novel) throw new Error("Novel not found.");
-  if (novel.author_id !== userId) throw new Error("Unauthorized: You can only add chapters to your own novels.");
+  if (!authorIds.includes(novel.author_id)) throw new Error("Unauthorized: You can only add chapters to your own novels.");
+
+  if (novel.author_id !== userId) {
+    await supabase
+      .from("novels")
+      .update({ author_id: userId })
+      .eq("id", novelId);
+  }
 
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;

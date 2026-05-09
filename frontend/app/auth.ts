@@ -3,6 +3,10 @@ import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import { createHmac } from "crypto";
 
+function uniqueStrings(values: Array<string | null | undefined>) {
+  return Array.from(new Set(values.filter((value): value is string => Boolean(value))));
+}
+
 function getInternalUserId(provider: string, providerAccountId: string) {
   const secret = process.env.AUTH_SECRET;
 
@@ -27,6 +31,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user, account }) {
       if (account?.provider === "google") {
         token.id = getInternalUserId(account.provider, account.providerAccountId);
+        token.legacyUserIds = uniqueStrings([
+          account.providerAccountId,
+          user?.id,
+          typeof token.sub === "string" ? token.sub : undefined,
+        ]).filter((id) => id !== token.id);
       } else if (user?.id) {
         token.id = user.id;
       }
@@ -36,6 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session({ session, token }) {
       if (session.user && typeof token.id === "string") {
         session.user.id = token.id;
+        session.user.legacyUserIds = Array.isArray(token.legacyUserIds) ? token.legacyUserIds : [];
       }
 
       return session;

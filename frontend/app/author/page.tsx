@@ -3,6 +3,7 @@ import { auth } from "../auth";
 import { redirect } from "next/navigation";
 import styles from "../styles/Author.module.css";
 import { supabase } from "@/app/lib/supabase";
+import { getSessionAuthorIds, syncAuthorIdentity } from "@/app/lib/authorIdentity";
 
 export const dynamic = "force-dynamic";
 
@@ -23,11 +24,14 @@ export default async function AuthorDashboard() {
     redirect("/profile");
   }
 
+  await syncAuthorIdentity(session);
+  const authorIds = getSessionAuthorIds(session);
+
   // Fetch novels by THIS author only, and include a count of their chapters
   const { data: authorNovels, error } = await supabase
     .from('novels')
     .select('*, chapters(count)')
-    .eq('author_id', session.user.id)
+    .in('author_id', authorIds)
     .order('created_at', { ascending: false });
 
   if (error) {
