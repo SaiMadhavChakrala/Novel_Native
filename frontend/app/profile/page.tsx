@@ -2,6 +2,8 @@ import { signIn, signOut, auth } from "../auth";
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
   const session = await auth();
   let isAuthor = false;

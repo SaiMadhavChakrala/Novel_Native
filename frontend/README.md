@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WebNovelHub Frontend
+
+Next.js app for Novel Native.
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies and run the development server:
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a local `.env.local` from `.env.example` before running pages that need Supabase, Google sign-in, or Gemini.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Vercel Deployment
 
-## Learn More
+Import the Git repository in Vercel and set the project Root Directory to `frontend`.
 
-To learn more about Next.js, take a look at the following resources:
+Use these project settings:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Framework Preset: Next.js
+- Install Command: `npm ci`
+- Build Command: `npm run build`
+- Output Directory: leave empty / Vercel default
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Add these Environment Variables in Vercel for Production, Preview, and Development as needed:
 
-## Deploy on Vercel
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `GEMINI_API_KEY`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `AUTH_SECRET`
+- `AUTH_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For local development, `AUTH_URL` and `NEXTAUTH_URL` are usually `http://localhost:3000`. In Vercel, set them to the deployed site URL, for example `https://your-project.vercel.app`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+In Google Cloud Console, add the matching OAuth redirect URI:
+
+```text
+https://your-project.vercel.app/api/auth/callback/google
+```
+
+For local development, also add:
+
+```text
+http://localhost:3000/api/auth/callback/google
+```
+
+Before deploying, verify locally with:
+
+```bash
+npm run lint
+npm run build
+```

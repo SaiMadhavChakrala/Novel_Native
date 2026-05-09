@@ -6,13 +6,18 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import styles from "../../../../styles/Chapter.module.css";
 
+interface ChapterData {
+  title: string;
+  content: string;
+}
+
 export default function ChapterPage() {
   const params = useParams();
   const id = params?.id as string;
   const chapterNumber = parseInt(params?.chapter as string);
 
   // States for DB Data
-  const [chapterData, setChapterData] = useState<any>(null);
+  const [chapterData, setChapterData] = useState<ChapterData | null>(null);
   const [totalChapters, setTotalChapters] = useState(0);
   const [loading, setLoading] = useState(true);
 

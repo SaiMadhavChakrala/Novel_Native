@@ -1,6 +1,5 @@
 import styles from './styles/Home.module.css';
 import Link from 'next/link';
-import { supabase } from './lib/content'
 
 const site_name: string = "WebNovelHub";
 
@@ -34,34 +33,4 @@ export default function Home() {
       </footer>
     </div>
   );
-}
-
-
-
-
-async function getNovels() {
-  const { data, error } = await supabase
-    .from('Profiles')
-    .select('*');
-  
-  if (error) console.error('Error fetching profile:', error);
-  else console.log('Profile:', data);
-}
-
-async function someFunction() {
-  const { data, error } = await supabase
-    .from('Profiles')
-    .insert({ 
-     id : 1, 
-     created_at: "09-22-2025",
-     Name: "Aswin Arun",
-     Display_name: "Amon"
-    });
-
-  if (error) {
-    console.error('Error inserting data:', error);
-    return;
-  }
-
-  console.log('Data inserted:', data);
 }

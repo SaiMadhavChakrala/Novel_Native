@@ -2,6 +2,16 @@ import Link from 'next/link';
 import styles from '../styles/Novels.module.css';
 import { supabase } from '@/app/lib/supabase'; 
 
+export const dynamic = "force-dynamic";
+
+interface NovelListItem {
+  id: string;
+  title: string;
+  description: string | null;
+  genre: string[] | null;
+  authors?: { pen_name: string | null } | null;
+}
+
 export default async function Novels() {
   // Fetch all novels, PLUS the author's pen name in a single query
   const { data: novels, error } = await supabase
@@ -22,7 +32,7 @@ export default async function Novels() {
         {!novels || novels.length === 0 ? (
           <p>No novels available right now. Check back later!</p>
         ) : (
-          novels.map((novel: any) => {
+          (novels as NovelListItem[]).map((novel) => {
             const authorName = novel.authors?.pen_name || "Unknown Author";
             // Check if tags exist, otherwise default to Uncategorized
             const tags = novel.genre && novel.genre.length > 0 ? novel.genre : ["Uncategorized"];

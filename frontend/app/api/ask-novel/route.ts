@@ -4,6 +4,21 @@ import { supabase } from '@/app/lib/supabase';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+function getEmbeddingValues(embeddingResponse: Awaited<ReturnType<GoogleGenAI["models"]["embedContent"]>>): number[] {
+  const values = embeddingResponse.embeddings?.[0]?.values;
+
+  if (!values) {
+    throw new Error("Gemini did not return embedding values.");
+  }
+
+  return values;
+}
+
+interface MatchedChapter {
+  title: string;
+  content: string;
+}
+
 // Enforce a strict JSON structure for the AI to return
 const citationSchema: Schema = {
   type: Type.OBJECT,
@@ -41,7 +56,7 @@ export async function POST(req: Request) {
     });
     
     // Extract the vector array
-    const queryEmbedding = embeddingResponse.embeddings[0].values;
+    const queryEmbedding = getEmbeddingValues(embeddingResponse);
 
     // 2. Hybrid Search (Vector + Keyword) & RRF Reranking
     const { data: matchedChapters, error } = await supabase.rpc('hybrid_search_chapters', {
@@ -58,7 +73,9 @@ export async function POST(req: Request) {
     }
 
     // 3. Format Context
-    const contextText = matchedChapters.map((ch: any) => `[Chapter: ${ch.title}]\n${ch.content}`).join("\n\n---\n\n");
+    const contextText = (matchedChapters as MatchedChapter[])
+      .map((ch) => `[Chapter: ${ch.title}]\n${ch.content}`)
+      .join("\n\n---\n\n");
 
     const prompt = `You are an enterprise-grade document assistant. Answer the user's question using ONLY the provided context. You MUST provide exact string quotes from the text as citations to prove your answer.\n\nContext:\n${contextText}\n\nQuestion: ${question}`;
 

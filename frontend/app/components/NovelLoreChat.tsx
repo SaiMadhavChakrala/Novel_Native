@@ -40,7 +40,7 @@ export default function NovelLoreChat({ novelId }: { novelId: string }) {
           setCitations(data.citations);
         }
       }
-    } catch (err) {
+    } catch {
       setAnswer("Sorry, the lore-master is currently asleep. Please try again later.");
     }
     setLoading(false);

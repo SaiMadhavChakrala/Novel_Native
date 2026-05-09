@@ -4,6 +4,16 @@ import { redirect } from "next/navigation";
 import styles from "../styles/Author.module.css";
 import { supabase } from "@/app/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
+interface AuthorNovel {
+  id: string;
+  title: string;
+  genre: string[] | null;
+  status: string | null;
+  chapters?: { count: number }[];
+}
+
 export default async function AuthorDashboard() {
   // Fetch the user's session
   const session = await auth();
@@ -44,7 +54,7 @@ export default async function AuthorDashboard() {
         {!authorNovels || authorNovels.length === 0 ? (
           <p>You have not created any novels yet. Start your writing journey today!</p>
         ) : (
-          authorNovels.map((novel: any) => {
+          (authorNovels as AuthorNovel[]).map((novel) => {
             // Supabase returns related counts in an array like: [{ count: 5 }]
             const chapterCount = novel.chapters?.[0]?.count || 0;
 

@@ -53,7 +53,7 @@ export default function CreateNovelPage() {
       if (result?.error) {
         setErrorMsg(result.error);
       }
-    } catch (err) {
+    } catch {
       setErrorMsg("An unexpected error occurred. Please try again.");
     }
   }

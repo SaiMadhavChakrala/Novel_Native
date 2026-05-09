@@ -3,6 +3,8 @@ import Link from "next/link";
 import styles from "../../styles/AuthorRegister.module.css";
 import AuthorRegistrationForm from "../../components/AuthorRegistrationForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function RegisterPage() {
   // Fetch the user's session on the server
   const session = await auth();

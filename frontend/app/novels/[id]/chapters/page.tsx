@@ -3,6 +3,8 @@ import { supabase } from "@/app/lib/supabase";
 import styles from "../../../styles/BrowseChapters.module.css";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function BrowseChaptersPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 

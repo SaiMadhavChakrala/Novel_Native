@@ -51,7 +51,7 @@ export default function AuthorRegistrationForm({ user }: AuthorRegistrationFormP
         setIsSubmitting(false);
       }
       // If successful, the server action automatically handles the redirect to /author!
-    } catch (error) {
+    } catch {
       setErrorMsg("Failed to register. Please try again later.");
       setIsSubmitting(false);
     }

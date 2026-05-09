@@ -4,6 +4,8 @@ import styles from "../../styles/NovelDetails.module.css";
 import { notFound } from "next/navigation";
 import NovelLoreChat from "../../components/NovelLoreChat";
 
+export const dynamic = "force-dynamic";
+
 export default async function NovelDetails({ params }: { params: Promise<{ id: string }> }) {
   // 1. Await the dynamic routing params
   const { id } = await params;

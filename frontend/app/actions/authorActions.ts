@@ -98,6 +98,16 @@ function getOverlapChunks(text: string, chunkSize = 1000, overlap = 200): string
   return chunks;
 }
 
+function getEmbeddingValues(embeddingResponse: Awaited<ReturnType<GoogleGenAI["models"]["embedContent"]>>): number[] {
+  const values = embeddingResponse.embeddings?.[0]?.values;
+
+  if (!values) {
+    throw new Error("Gemini did not return embedding values.");
+  }
+
+  return values;
+}
+
 /**
  * 3. ADD CHAPTER LOGIC (With Advanced Overlap Chunking)
  */
@@ -162,7 +172,7 @@ export async function addChapterAction(novelId: string, formData: FormData) {
       chapter_id: newChapter.id, // Link this chunk back to the main chapter
       chunk_index: i,
       content: chunkText,
-      embedding: embeddingResponse.embeddings[0].values, 
+      embedding: getEmbeddingValues(embeddingResponse), 
     });
   }
 
