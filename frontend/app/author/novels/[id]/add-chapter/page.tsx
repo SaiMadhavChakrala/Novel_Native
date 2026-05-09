@@ -1,6 +1,8 @@
 import { addChapterAction } from "@/app/actions/authorActions";
 import styles from "@/app/styles/AddChapter.module.css";
 
+const MAX_CHAPTER_CONTENT_LENGTH = 8000;
+
 // FIX: In Next.js 15, params is a Promise that must be awaited
 export default async function AddChapterPage({ params }: { params: Promise<{ id: string }> }) {
   // Await the params before extracting the ID
@@ -19,7 +21,7 @@ export default async function AddChapterPage({ params }: { params: Promise<{ id:
       <form action={submitChapter} className={styles.form}>
         <div className={styles.formGroup}>
           <label className={styles.label}>Chapter Number</label>
-          <input className={styles.input} type="number" name="chapterNumber" placeholder="e.g. 1" required />
+          <input className={styles.input} type="number" name="chapterNumber" min="1" step="1" placeholder="e.g. 1" required />
         </div>
 
         <div className={styles.formGroup}>
@@ -29,7 +31,14 @@ export default async function AddChapterPage({ params }: { params: Promise<{ id:
 
         <div className={styles.formGroup}>
           <label className={styles.label}>Content</label>
-          <textarea className={styles.textarea} name="content" placeholder="Write your story here..." rows={15} required />
+          <textarea
+            className={styles.textarea}
+            name="content"
+            placeholder="Write your story here..."
+            rows={15}
+            maxLength={MAX_CHAPTER_CONTENT_LENGTH}
+            required
+          />
         </div>
         
         <div className={styles.formGroup} style={{ marginTop: '1rem' }}>

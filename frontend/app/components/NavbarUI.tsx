@@ -3,15 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import styles from "../styles/Navbar.module.css";
-import type { Session } from "next-auth";
 
 interface NavbarUIProps {
-  session: Session | null;
+  userName: string | null;
 }
 
 const site_name: string = "WebNovelHub";
 
-export default function NavbarUI({ session }: NavbarUIProps) {
+export default function NavbarUI({ userName }: NavbarUIProps) {
   // State to control the navbar's visibility
   const [isVisible, setIsVisible] = useState(true);
 
@@ -27,9 +26,9 @@ export default function NavbarUI({ session }: NavbarUIProps) {
             <Link href="/novels" className={styles.navLink}>
               Novels
             </Link>
-            {session?.user ? (
+            {userName ? (
                 <>
-              <Link href="/profile" className={styles.navLink} title="Profile">{session.user.name!}
+              <Link href="/profile" className={styles.navLink} title="Profile">{userName}
               </Link>
               <Link href="/author" className={styles.navLink}>
                   My Novels

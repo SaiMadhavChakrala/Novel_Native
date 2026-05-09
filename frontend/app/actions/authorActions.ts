@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { GoogleGenAI } from '@google/genai'; // Added missing Gemini import
 
+const MAX_CHAPTER_CONTENT_LENGTH = 8000;
+
 /**
  * 1. CREATE NOVEL LOGIC
  */
@@ -131,6 +133,14 @@ export async function addChapterAction(novelId: string, formData: FormData) {
   const chapterNumber = parseInt(formData.get("chapterNumber") as string);
   const isPublished = formData.get("isPublished") === "true";
 
+  if (!Number.isInteger(chapterNumber) || chapterNumber < 1) {
+    throw new Error("Chapter number must be a positive whole number.");
+  }
+
+  if (content.length > MAX_CHAPTER_CONTENT_LENGTH) {
+    throw new Error(`Chapter content must be ${MAX_CHAPTER_CONTENT_LENGTH} characters or fewer.`);
+  }
+
   // 1. SAVE THE CHAPTER TEXT FIRST (So readers can read it)
   // Notice we are no longer saving an embedding to the 'chapters' table
   const { data: newChapter, error: insertError } = await supabase
@@ -148,6 +158,12 @@ export async function addChapterAction(novelId: string, formData: FormData) {
   if (insertError || !newChapter) {
     console.error("Database Error:", insertError);
     throw new Error("Failed to add chapter. Does this chapter number already exist?");
+  }
+
+  if (!isPublished) {
+    revalidatePath(`/novels/${novelId}`);
+    revalidatePath(`/author`);
+    redirect("/author");
   }
 
   // 2. SPLIT TEXT INTO 1000-CHAR CHUNKS WITH 200-CHAR OVERLAP

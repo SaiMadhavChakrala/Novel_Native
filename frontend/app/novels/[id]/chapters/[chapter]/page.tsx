@@ -11,6 +11,10 @@ interface ChapterData {
   content: string;
 }
 
+interface ChapterNavItem {
+  chapter_number: number;
+}
+
 export default function ChapterPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -18,7 +22,8 @@ export default function ChapterPage() {
 
   // States for DB Data
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
-  const [totalChapters, setTotalChapters] = useState(0);
+  const [previousChapter, setPreviousChapter] = useState<number | null>(null);
+  const [nextChapter, setNextChapter] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   // States for UI
@@ -33,20 +38,26 @@ export default function ChapterPage() {
       // Fetch the specific chapter
       const { data } = await supabase
         .from("chapters")
-        .select("*")
+        .select("title, content")
         .eq("novel_id", id)
         .eq("chapter_number", chapterNumber)
+        .eq("is_published", true)
         .single();
 
-      // Count total published chapters to know if we should hide the "Next" button
-      const { count } = await supabase
+      // Fetch published chapter numbers so draft gaps do not break previous/next links.
+      const { data: publishedChapters } = await supabase
         .from("chapters")
-        .select("*", { count: "exact", head: true })
+        .select("chapter_number")
         .eq("novel_id", id)
-        .eq("is_published", true);
+        .eq("is_published", true)
+        .order("chapter_number", { ascending: true });
+
+      const chapterNumbers = ((publishedChapters || []) as ChapterNavItem[]).map((chapter) => chapter.chapter_number);
+      const currentIndex = chapterNumbers.indexOf(chapterNumber);
 
       setChapterData(data);
-      setTotalChapters(count || 0);
+      setPreviousChapter(currentIndex > 0 ? chapterNumbers[currentIndex - 1] : null);
+      setNextChapter(currentIndex >= 0 && currentIndex < chapterNumbers.length - 1 ? chapterNumbers[currentIndex + 1] : null);
       setLoading(false);
     }
 
@@ -101,13 +112,13 @@ export default function ChapterPage() {
           )}
 
           <div className={styles.navButtons}>
-            {chapterNumber > 1 && (
-              <Link href={`/novels/${id}/chapters/${chapterNumber - 1}`} className={styles.buttonOutline}>
+            {previousChapter && (
+              <Link href={`/novels/${id}/chapters/${previousChapter}`} className={styles.buttonOutline}>
                 ← Previous
               </Link>
             )}
-            {chapterNumber < totalChapters && (
-              <Link href={`/novels/${id}/chapters/${chapterNumber + 1}`} className={styles.button}>
+            {nextChapter && (
+              <Link href={`/novels/${id}/chapters/${nextChapter}`} className={styles.button}>
                 Next →
               </Link>
             )}

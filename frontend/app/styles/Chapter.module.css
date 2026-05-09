@@ -179,74 +179,112 @@
   position: static;
   height: auto;
   min-height: 100vh;
-  background-color: #0A192F;
-  color: #E0E6F1;
+  background:
+    linear-gradient(180deg, #171717 0%, #101010 100%);
+  color: #ece7dc;
 }
 
 .plainTextContainer .contentWrapper {
   height: auto;
+  width: min(100%, 900px);
+  min-height: 100vh;
+  padding: clamp(4.5rem, 7vw, 5.25rem) clamp(1rem, 4vw, 2rem) 2.5rem;
+}
+
+.plainTextContainer .header {
+  max-width: 760px;
+  margin: 0 auto clamp(1.25rem, 3vw, 2rem);
 }
 
 .plainTextContainer .header h1 {
-  color: #FFFFFF;
+  color: #f7f1e6;
   text-shadow: none;
+  font-size: clamp(1.85rem, 5vw, 2.55rem);
+  letter-spacing: 0;
+}
+
+.plainTextContainer .backToNovelLink {
+  color: #b9b0a1;
+}
+
+.plainTextContainer .backToNovelLink:hover {
+  color: #f7f1e6;
 }
 
 .plainTextContent {
-  background-color: transparent !important;
+  width: min(100%, 760px);
+  flex-grow: 0;
+  background: #221f1a !important;
   backdrop-filter: none;
-  border: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(236, 231, 220, 0.16);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+  color: #e9e0d1;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+  line-height: 1.85;
+  margin: 0 auto 2rem;
+  padding: clamp(1.4rem, 4vw, 2.5rem);
+  border-radius: 8px;
   text-shadow: none;
+  overflow-wrap: break-word;
+}
+
+.plainTextContent p {
+  max-width: 66ch;
+  margin: 0 auto;
 }
 
 .plainTextContainer .button {
-  background-color: rgba(56, 189, 248, 0.8);
-  color: #0A192F;
+  background-color: #d8b46a;
+  color: #181510;
   font-weight: 700;
 }
 .plainTextContainer .button:hover {
-  background-color: rgba(56, 189, 248, 1);
+  background-color: #e5c67d;
 }
 
 .plainTextContainer .buttonOutline {
-  background-color: transparent;
-  color: #E0E6F1;
-  border-color: rgba(224, 230, 241, 0.5);
+  background-color: rgba(236, 231, 220, 0.05);
+  color: #ece7dc;
+  border-color: rgba(236, 231, 220, 0.28);
 }
 .plainTextContainer .buttonOutline:hover {
-  background-color: rgba(224, 230, 241, 0.1);
-  border-color: #E0E6F1;
+  background-color: rgba(236, 231, 220, 0.1);
+  border-color: rgba(236, 231, 220, 0.55);
 }
 
 .plainTextContainer .buttonSmall,
 .plainTextContainer .bookmark {
-  color: #94A3B8;
+  color: #afa697;
 }
 .plainTextContainer .buttonSmall:hover {
-  color: #E0E6F1;
+  color: #f7f1e6;
 }
 
 .plainTextContainer .footer {
-  border-top-color: rgba(224, 230, 241, 0.2);
+  width: min(100%, 760px);
+  margin: 0 auto;
+  border-top-color: rgba(236, 231, 220, 0.14);
 }
 .plainTextContainer .toggleButton {
-  background: rgba(224, 230, 241, 0.1);
-  border: 1px solid rgba(224, 230, 241, 0.2);
-  color: #E0E6F1;
-  padding: 6px 12px;
-  border-radius: 8px;
+  background: rgba(236, 231, 220, 0.07);
+  border: 1px solid rgba(236, 231, 220, 0.22);
+  color: #ece7dc;
+  padding: 0.6rem 0.9rem;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .plainTextContainer .toggleButton:hover {
-  background: rgba(224, 230, 241, 0.2);
-  border-color: rgba(224, 230, 241, 0.4);
+  background: rgba(236, 231, 220, 0.12);
+  border-color: rgba(236, 231, 220, 0.4);
 }
 
 .plainTextContainer .toggleButton.active {
-  background: rgba(224, 230, 241, 0.3);
-  border-color: rgba(224, 230, 241, 0.6);
+  background: rgba(216, 180, 106, 0.18);
+  border-color: rgba(216, 180, 106, 0.58);
 }
 
 .highlightedSentence {

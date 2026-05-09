@@ -1,28 +1,41 @@
 
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
+import { createHmac } from "crypto";
+
+function getInternalUserId(provider: string, providerAccountId: string) {
+  const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+
+  if (!secret) {
+    throw new Error("AUTH_SECRET or NEXTAUTH_SECRET is required for stable user ids.");
+  }
+
+  return `${provider}:${createHmac("sha256", secret).update(providerAccountId).digest("hex")}`;
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      checks: ['none'], // Keep this if you added it earlier to fix the PKCE issue
     }),
   ],
   // 👇 ADD THIS CALLBACKS SECTION 👇
   callbacks: {
-    jwt({ token, user }) {
-      if (user) { // User is available during sign-in
-        token.id = user.id
+    jwt({ token, user, account }) {
+      if (account?.provider === "google") {
+        token.id = getInternalUserId(account.provider, account.providerAccountId);
+      } else if (user?.id) {
+        token.id = user.id;
       }
+
       return token
     },
     session({ session, token }) {
-      if (session.user && token.sub) {
-        // Inject the Google User ID (token.sub) into the session
-        session.user.id = token.sub; 
+      if (session.user && typeof token.id === "string") {
+        session.user.id = token.id;
       }
+
       return session;
     },
   },

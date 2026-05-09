@@ -5,5 +5,5 @@ import NavbarUI from "./NavbarUI"; // We will create this next
 export default async function Navbar() {
   const session = await auth();
 
-  return <NavbarUI session={session} />;
+  return <NavbarUI userName={session?.user?.name ?? null} />;
 }
