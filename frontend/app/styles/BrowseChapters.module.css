@@ -1,0 +1,87 @@
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  color: #f0f0f0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.title {
+  font-size: 2rem;
+  color: #58a6ff;
+  margin: 0;
+}
+
+.backButton {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  text-decoration: none;
+  background-color: #252525;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.subtitle {
+  text-align: center;
+  color: #a0a0a0;
+  margin-bottom: 2rem;
+}
+
+.listContainer {
+  background: #161b22;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.listContainer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.listItem a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #f0f0f0;
+  background-color: #0d1117;
+  border: 1px solid #333;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.listItem a:hover {
+  background-color: #252525;
+  border-color: #58a6ff;
+}
+
+.chapterNumber {
+  font-weight: bold;
+  color: #58a6ff;
+  font-size: 0.9rem;
+  min-width: 60px;
+}
+
+.chapterTitle {
+  font-weight: 500;
+}

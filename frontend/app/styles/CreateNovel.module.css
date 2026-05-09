@@ -131,6 +131,7 @@
 .button {
   background-color: #0070f3;
   color: white;
+  border-color: #0070f3;
 }
 .button:hover:not(:disabled) {
   background-color: #005bb5;
@@ -150,6 +151,7 @@
 }
 .buttonOutline:hover {
   background-color: #333;
+  border-color: #777;
 }
 
 /* Responsive layout for smaller screens */
@@ -157,4 +159,69 @@
   .formGrid {
     grid-template-columns: 1fr;
   }
+}
+
+/* --- TAGS STYLING --- */
+.selectedTagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  background-color: #1a1a1a;
+  border: 1px dashed #555;
+  border-radius: 6px;
+  min-height: 50px;
+}
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tagPill, .tagPillActive {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tagPill {
+  background-color: #333;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.tagPill:hover {
+  background-color: #444;
+  border-color: #666;
+  transform: translateY(-1px);
+}
+
+.tagPillActive {
+  background-color: #0070f3;
+  color: white;
+  border-color: #0070f3;
+}
+
+.tagPillActive:hover {
+  background-color: #005bb5;
+  border-color: #005bb5;
+}
+
+.customTagInputWrapper {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.customTagInputWrapper input {
+  flex: 1;
 }

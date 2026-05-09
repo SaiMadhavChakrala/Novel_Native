@@ -1,34 +1,27 @@
 import Link from "next/link";
-import { auth } from "../auth"; // Assuming auth.ts is in the root
+import { auth } from "../auth";
 import { redirect } from "next/navigation";
 import styles from "../styles/Author.module.css";
-
-// Mock data for the novels written by the logged-in author.
-// In a real application, you would fetch this from your database.
-const authorNovels = [
-  {
-    id: 1,
-    title: "Shadow Realm",
-    genre: "Fantasy",
-    chapters: Array.from({ length: 10 }),
-    status: "Ongoing",
-  },
-  {
-    id: 4,
-    title: "Chronicles of Dawn",
-    genre: "Adventure",
-    chapters: Array.from({ length: 25 }),
-    status: "Completed",
-  },
-];
+import { supabase } from "@/app/lib/supabase";
 
 export default async function AuthorDashboard() {
   // Fetch the user's session
   const session = await auth();
 
   // If no user is logged in, redirect them to the profile page to sign in.
-  if (!session?.user) {
+  if (!session?.user?.id) {
     redirect("/profile");
+  }
+
+  // Fetch novels by THIS author only, and include a count of their chapters
+  const { data: authorNovels, error } = await supabase
+    .from('novels')
+    .select('*, chapters(count)')
+    .eq('author_id', session.user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching author novels:", error);
   }
 
   return (
@@ -48,42 +41,50 @@ export default async function AuthorDashboard() {
       </div>
 
       <div className={styles.novelsGrid}>
-        {authorNovels.map((novel) => (
-          <div key={novel.id} className={styles.card}>
-            <h3>{novel.title}</h3>
-            <p className={styles.meta}>
-              {novel.genre} •{" "}
-              <span
-                className={
-                  novel.status === "Ongoing"
-                    ? styles.statusOngoing
-                    : styles.statusCompleted
-                }
-              >
-                {novel.status}
-              </span>
-            </p>
-            <p>
-              <strong>Published Chapters:</strong> {novel.chapters.length}
-            </p>
+        {!authorNovels || authorNovels.length === 0 ? (
+          <p>You have not created any novels yet. Start your writing journey today!</p>
+        ) : (
+          authorNovels.map((novel: any) => {
+            // Supabase returns related counts in an array like: [{ count: 5 }]
+            const chapterCount = novel.chapters?.[0]?.count || 0;
 
-            <div className={styles.actions}>
-              {/* This link would go to a page for adding a new chapter */}
-              <Link
-                href={`/author/novels/${novel.id}/add-chapter`}
-                className={styles.button}
-              >
-                Add Chapter
-              </Link>
-              <Link
-                href={`/novels/${novel.id}`}
-                className={styles.buttonOutline}
-              >
-                View Novel
-              </Link>
-            </div>
-          </div>
-        ))}
+            return (
+              <div key={novel.id} className={styles.card}>
+                <h3>{novel.title}</h3>
+                <p className={styles.meta}>
+                  {novel.genre && novel.genre.length > 0 ? novel.genre.join(', ') : 'Uncategorized'} •{" "}
+                  <span
+                    className={
+                      novel.status === "Ongoing"
+                        ? styles.statusOngoing
+                        : styles.statusCompleted
+                    }
+                  >
+                    {novel.status}
+                  </span>
+                </p>
+                <p>
+                  <strong>Total Chapters:</strong> {chapterCount}
+                </p>
+
+                <div className={styles.actions}>
+                  <Link
+                    href={`/author/novels/${novel.id}/add-chapter`}
+                    className={styles.button}
+                  >
+                    Add Chapter
+                  </Link>
+                  <Link
+                    href={`/novels/${novel.id}`}
+                    className={styles.buttonOutline}
+                  >
+                    View Novel
+                  </Link>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

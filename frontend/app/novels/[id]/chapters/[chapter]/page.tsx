@@ -1,85 +1,89 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/app/lib/supabase";
 import styles from "../../../../styles/Chapter.module.css";
 
 export default function ChapterPage() {
   const params = useParams();
   const id = params?.id as string;
-  const chapter = params?.chapter as string;
+  const chapterNumber = parseInt(params?.chapter as string);
 
-  // --- MOCK DATA ---
-  const chapterData = {
-    title: "A New Beginning",
-    content: `
-      The wind howled as shadows danced across the forest floor. 
-      Elara gripped her lantern tightly, its dim glow the only 
-      barrier between her and the encroaching darkness...
-      
-      She knew this was only the beginning.
-      The wind howled as shadows danced across the forest floor. 
-      Elara gripped her lantern tightly, its dim glow the only 
-      barrier between her and the encroaching darkness...
-      
-      She knew this was only the beginning.
-    `,
-    backgroundImageUrl: "/images/chained_iles.jpg",
-  };
-  const totalChapters = 10;
-  // --- END MOCK DATA ---
+  // States for DB Data
+  const [chapterData, setChapterData] = useState<any>(null);
+  const [totalChapters, setTotalChapters] = useState(0);
+  const [loading, setLoading] = useState(true);
 
+  // States for UI
   const [opacity, setOpacity] = useState(0.25);
-  // 👇 1. Add state to manage the plain text mode
   const [isPlainText, setIsPlainText] = useState(false);
+
+  useEffect(() => {
+    if (!id || !chapterNumber) return;
+
+    async function fetchChapter() {
+      setLoading(true);
+      // Fetch the specific chapter
+      const { data } = await supabase
+        .from("chapters")
+        .select("*")
+        .eq("novel_id", id)
+        .eq("chapter_number", chapterNumber)
+        .single();
+
+      // Count total published chapters to know if we should hide the "Next" button
+      const { count } = await supabase
+        .from("chapters")
+        .select("*", { count: "exact", head: true })
+        .eq("novel_id", id)
+        .eq("is_published", true);
+
+      setChapterData(data);
+      setTotalChapters(count || 0);
+      setLoading(false);
+    }
+
+    fetchChapter();
+  }, [id, chapterNumber]);
+
+  if (loading) return <div className={styles.container} style={{ textAlign: "center", padding: "5rem" }}>Loading Chapter...</div>;
+  if (!chapterData) return <div className={styles.container} style={{ textAlign: "center", padding: "5rem" }}>Chapter not found.</div>;
 
   return (
     <div
-      className={`${styles.container} ${
-        isPlainText ? styles.plainTextContainer : ""
-      }`}
-      // 👇 2. Conditionally apply the background image
-      style={
-        !isPlainText
-          ? { backgroundImage: `url(${chapterData.backgroundImageUrl})` }
-          : {}
-      }
+      className={`${styles.container} ${isPlainText ? styles.plainTextContainer : ""}`}
+      style={!isPlainText ? { backgroundImage: `url(/images/chained_iles.jpg)` } : {}}
     >
       {!isPlainText && <div className={styles.overlay}></div>}
       <div className={styles.contentWrapper}>
         <header className={styles.header}>
-          <h1>Chapter {chapter}: {chapterData.title}</h1>
-          {/* 👇 3. Add the toggle button */}
-
+          <Link href={`/novels/${id}`} className={styles.backToNovelLink}>
+            ← Back to Novel
+          </Link>
+          <h1>Chapter {chapterNumber}: {chapterData.title}</h1>
+          
           <button 
             onClick={() => setIsPlainText(!isPlainText)}
             className={`${styles.toggleButton} ${isPlainText ? styles.active : ""}`}
-            title="Toggle Plain Text Mode"
           >
-            {isPlainText ? "View Picture" : "Read only text"}
+            {isPlainText ? "View Picture Mode" : "Read Only Text"}
           </button>
-
         </header>
         
         <article
-          className={`${styles.content} ${
-            isPlainText ? styles.plainTextContent : ""
-          }`}
-          style={
-            !isPlainText
-              ? { backgroundColor: `rgba(10, 10, 10, ${opacity})` }
-              : {}
-          }
+          className={`${styles.content} ${isPlainText ? styles.plainTextContent : ""}`}
+          style={!isPlainText ? { backgroundColor: `rgba(10, 10, 10, ${opacity})` } : {}}
         >
-          <p>{chapterData.content}</p>
+          {/* CRITICAL FIX: whiteSpace 'pre-wrap' forces HTML to respect database line breaks! */}
+          <p style={{ whiteSpace: "pre-wrap", lineHeight: "1.8" }}>{chapterData.content}</p>
         </article>
         
         <footer className={styles.footer}>
-          {/* 👇 4. Conditionally render the slider */}
           {!isPlainText && (
             <div className={styles.settingsControl}>
-              <span>Opacity</span>
+              <span>Background Opacity</span>
               <input
                 type="range"
                 min="0"
@@ -92,25 +96,16 @@ export default function ChapterPage() {
           )}
 
           <div className={styles.navButtons}>
-            {Number(chapter) > 1 && (
-              <Link
-                href={`/novels/${id}/chapters/${Number(chapter) - 1}`}
-                className={styles.buttonOutline}
-              >
+            {chapterNumber > 1 && (
+              <Link href={`/novels/${id}/chapters/${chapterNumber - 1}`} className={styles.buttonOutline}>
                 ← Previous
               </Link>
             )}
-            {Number(chapter) < totalChapters && (
-              <Link
-                href={`/novels/${id}/chapters/${Number(chapter) + 1}`}
-                className={styles.button}
-              >
+            {chapterNumber < totalChapters && (
+              <Link href={`/novels/${id}/chapters/${chapterNumber + 1}`} className={styles.button}>
                 Next →
               </Link>
             )}
-          </div>
-          <div className={styles.bookmark}>
-            📌 <button className={styles.buttonSmall}>Bookmark This Chapter</button>
           </div>
         </footer>
       </div>
