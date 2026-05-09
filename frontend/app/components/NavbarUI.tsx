@@ -29,7 +29,7 @@ export default function NavbarUI({ session }: NavbarUIProps) {
             </Link>
             {session?.user ? (
                 <>
-              <Link href="/profile" title="Profile">{session.user.name!}
+              <Link href="/profile" className={styles.navLink} title="Profile">{session.user.name!}
               </Link>
               <Link href="/author" className={styles.navLink}>
                   My Novels
@@ -49,8 +49,9 @@ export default function NavbarUI({ session }: NavbarUIProps) {
         onClick={() => setIsVisible(!isVisible)}
         className={styles.toggleButton}
         title={isVisible ? "Hide Navbar" : "Show Navbar"}
+        aria-label={isVisible ? "Hide navigation" : "Show navigation"}
       >
-        {isVisible ? "↑" : "↓"}
+        <span aria-hidden="true">{isVisible ? "⌃" : "⌄"}</span>
       </button>
     </>
   );

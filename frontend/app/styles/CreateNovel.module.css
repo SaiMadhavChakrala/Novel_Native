@@ -1,7 +1,7 @@
 .container {
   max-width: 1000px;
-  margin: 2rem auto;
-  padding: 2rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) 1.25rem;
   color: #e0e0e0;
 }
 
@@ -11,7 +11,7 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 6vw, 3rem);
   margin-bottom: 0.5rem;
 }
 
@@ -21,10 +21,10 @@
 }
 
 .form {
-  background-color: #252525;
-  padding: 2rem;
+  background-color: #161b22;
+  padding: clamp(1.25rem, 5vw, 2rem);
   border-radius: 8px;
-  border: 1px solid #333;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .formGrid {
@@ -52,8 +52,9 @@
 }
 
 .input, .select, .textarea {
-  background-color: #1e1e1e;
-  border: 1px solid #444;
+  width: 100%;
+  background-color: #0d1117;
+  border: 1px solid rgba(148, 163, 184, 0.26);
   border-radius: 6px;
   padding: 0.75rem 1rem;
   color: #e0e0e0;
@@ -111,6 +112,7 @@
 .actions {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 1rem;
   padding-top: 1.5rem;
   border-top: 1px solid #333;
@@ -129,12 +131,12 @@
 }
 
 .button {
-  background-color: #0070f3;
+  background-color: #2563eb;
   color: white;
-  border-color: #0070f3;
+  border-color: #2563eb;
 }
 .button:hover:not(:disabled) {
-  background-color: #005bb5;
+  background-color: #1d4ed8;
 }
 
 .button:disabled {
@@ -168,8 +170,8 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   padding: 0.75rem;
-  background-color: #1a1a1a;
-  border: 1px dashed #555;
+  background-color: #0d1117;
+  border: 1px dashed rgba(148, 163, 184, 0.35);
   border-radius: 6px;
   min-height: 50px;
 }
@@ -206,14 +208,14 @@
 }
 
 .tagPillActive {
-  background-color: #0070f3;
+  background-color: #2563eb;
   color: white;
-  border-color: #0070f3;
+  border-color: #2563eb;
 }
 
 .tagPillActive:hover {
-  background-color: #005bb5;
-  border-color: #005bb5;
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
 }
 
 .customTagInputWrapper {
@@ -224,4 +226,17 @@
 
 .customTagInputWrapper input {
   flex: 1;
+}
+
+@media (max-width: 640px) {
+  .customTagInputWrapper,
+  .actions {
+    flex-direction: column;
+  }
+
+  .button,
+  .buttonOutline {
+    width: 100%;
+    text-align: center;
+  }
 }

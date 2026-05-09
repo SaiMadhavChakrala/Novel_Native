@@ -4,11 +4,11 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100dvh;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  color: #f0f0f0; /* Use a slightly off-white for text to reduce eye strain */
+  color: #f0f0f0;
 }
 
 /* A more dynamic gradient overlay for better atmosphere */
@@ -43,50 +43,52 @@
 }
 
 
-/* Wrapper for all the content, enables scrolling */
 .contentWrapper {
   position: relative;
   z-index: 2;
-  max-width: 800px;
+  width: min(100%, 840px);
   margin: 0 auto;
-  padding: 3rem 2rem;
-  height: 100vh;
+  padding: clamp(4.75rem, 8vw, 5.5rem) 1.25rem 2rem;
+  height: 100dvh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-
-  /* --- Scrollbar styles for Firefox --- */
-  scrollbar-width: none; /* For Firefox */
+  scrollbar-width: none;
   -ms-overflow-style: none; 
 }
 
 .header {
-  text-align: center;
-  margin-bottom: 2.5rem;
+  position: relative;
+  text-align: left;
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .header h1 {
-  font-size: 3rem;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.12;
   font-family: Georgia, 'Times New Roman', serif;
   font-weight: 500;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  margin: 0 0 1rem;
 }
 
 .content {
   flex-grow: 1;
-  font-size: 1.15rem;
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
   line-height: 1.9;
   white-space: pre-wrap;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 2rem;
-  border-radius: 12px;
+  padding: clamp(1.1rem, 4vw, 2rem);
+  border-radius: 8px;
   margin-bottom: 2rem;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  overflow-wrap: anywhere;
+}
 
-  /* 👇 This creates a gap between the text and the scrollbar */
-  margin-right: 1rem;
+.content p {
+  margin: 0;
 }
 
 .footer {
@@ -99,16 +101,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
-
-/* --- BUTTON STYLES --- */
-/* ... (keep your existing button styles) ... */
 
 .button,
 .buttonOutline,
 .buttonSmall {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.7rem 1.5rem;
   border-radius: 6px;
   text-decoration: none;
@@ -120,11 +123,11 @@
 }
 
 .button {
-  background-color: rgba(0, 112, 243, 0.8);
+  background-color: rgba(37, 99, 235, 0.88);
   color: white;
 }
 .button:hover {
-  background-color: rgba(0, 112, 243, 1);
+  background-color: rgba(29, 78, 216, 1);
 }
 
 .buttonOutline {
@@ -152,20 +155,18 @@
   color: #ccc;
 }
 
-/* --- 👇 ADD THIS NEW SECTION FOR SCROLLBAR STYLING --- */
-/* For Webkit browsers (Chrome, Safari, Edge) */
 .contentWrapper::-webkit-scrollbar {
   width: 10px;
 }
 
 .contentWrapper::-webkit-scrollbar-track {
-  background: transparent; /* Makes the track invisible */
+  background: transparent;
 }
 
 .contentWrapper::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4); /* The draggable part */
+  background-color: rgba(255, 255, 255, 0.4);
   border-radius: 10px;
-  border: 2px solid transparent; /* Creates padding around thumb */
+  border: 2px solid transparent;
   background-clip: content-box;
 }
 
@@ -178,8 +179,8 @@
   position: static;
   height: auto;
   min-height: 100vh;
-  background-color: #0A192F; /* Midnight Blue Background */
-  color: #E0E6F1; /* Soft, slightly blue-tinted white text */
+  background-color: #0A192F;
+  color: #E0E6F1;
 }
 
 .plainTextContainer .contentWrapper {
@@ -187,20 +188,19 @@
 }
 
 .plainTextContainer .header h1 {
-  color: #FFFFFF; /* Brighter white for the title */
+  color: #FFFFFF;
   text-shadow: none;
 }
 
 .plainTextContent {
-  background-color: transparent !important; /* Important to override inline style */
+  background-color: transparent !important;
   backdrop-filter: none;
   border: none;
   text-shadow: none;
 }
 
-/* Update button styles for the dark theme */
 .plainTextContainer .button {
-  background-color: rgba(56, 189, 248, 0.8); /* A nice sky blue */
+  background-color: rgba(56, 189, 248, 0.8);
   color: #0A192F;
   font-weight: 700;
 }
@@ -220,7 +220,7 @@
 
 .plainTextContainer .buttonSmall,
 .plainTextContainer .bookmark {
-  color: #94A3B8; /* Slate gray color */
+  color: #94A3B8;
 }
 .plainTextContainer .buttonSmall:hover {
   color: #E0E6F1;
@@ -239,21 +239,16 @@
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
-/* Hover state */
 .plainTextContainer .toggleButton:hover {
   background: rgba(224, 230, 241, 0.2);
   border-color: rgba(224, 230, 241, 0.4);
 }
 
-/* Optional active/selected state */
 .plainTextContainer .toggleButton.active {
   background: rgba(224, 230, 241, 0.3);
   border-color: rgba(224, 230, 241, 0.6);
 }
 
-/* --- 👇 ADD THESE NEW STYLES TO THE END OF YOUR CSS FILE --- */
-
-/* Style for the currently spoken sentence */
 .highlightedSentence {
   background-color: rgba(56, 189, 248, 0.3);
   color: #fff;
@@ -261,7 +256,6 @@
   border-radius: 4px;
 }
 
-/* Fixed bar at the bottom for media controls */
 .mediaControls {
   position: fixed;
   bottom: 0;
@@ -296,9 +290,8 @@
 
 
 .backToNovelLink {
-  position: absolute;
-  top: 10px; /* Adjust as needed */
-  left: 0; /* Align to the left of the header */
+  display: inline-flex;
+  margin-bottom: 1rem;
   color: #a0a0a0;
   text-decoration: none;
   font-size: 0.9rem;
@@ -309,11 +302,37 @@
   color: #fff;
 }
 
-/* Make sure the plain text version looks good too */
 .plainTextContainer .backToNovelLink {
-  color: #94A3B8; /* Use the slate gray color from your theme */
+  color: #94A3B8;
 }
 
 .plainTextContainer .backToNovelLink:hover {
-  color: #E0E6F1; /* Use the light text color from your theme */
+  color: #E0E6F1;
+}
+
+.settingsControl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  color: #dbeafe;
+}
+
+.settingsControl input {
+  width: min(260px, 100%);
+}
+
+@media (max-width: 560px) {
+  .toggleButton,
+  .button,
+  .buttonOutline {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navButtons {
+    flex-direction: column;
+  }
 }

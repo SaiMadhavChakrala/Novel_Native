@@ -2,18 +2,15 @@
   position: sticky;
   top: 0;
   width: 100%;
-  padding: 1rem 0;
+  padding: 0.85rem 0;
   z-index: 50;
-  background-color: rgba(18, 18, 18, 0.6);
+  background-color: rgba(13, 17, 23, 0.82);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-  /* 👇 Add transition for the slide animation */
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
   transition: transform 0.4s ease-in-out;
 }
 
-/* 👇 New class to hide the navbar by sliding it up */
 .navbar.hidden {
   transform: translateY(-100%);
 }
@@ -21,31 +18,36 @@
 .navContent {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
-/* ... keep all your other existing styles for .logo, .navLinks, etc. ... */
 .logo {
-  font-size: 1.5rem;
+  font-size: clamp(1.05rem, 4vw, 1.5rem);
   font-weight: 700;
   color: #fff;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: flex-end;
+  gap: clamp(0.6rem, 2vw, 1.5rem);
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .navLink {
-  color: #a0a0a0;
+  color: #cbd5e1;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
+  white-space: nowrap;
 }
 
 .navLink:hover {
@@ -53,7 +55,7 @@
 }
 
 .signInButton {
-  background-color: #0070f3;
+  background-color: #2563eb;
   color: white;
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
@@ -63,7 +65,7 @@
 }
 
 .signInButton:hover {
-  background-color: #005bb5;
+  background-color: #1d4ed8;
 }
 
 .avatar {
@@ -77,27 +79,61 @@
 }
 
 
-/* --- 👇 ADD THESE NEW STYLES FOR THE TOGGLE BUTTON --- */
 .toggleButton {
   position: fixed;
-  top: 1rem;
+  top: 0.95rem;
   right: 1rem;
-  z-index: 100; /* Must be higher than the navbar's z-index */
-  width: 40px;
-  height: 40px;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
+  z-index: 100;
+  width: 34px;
+  height: 34px;
+  background-color: rgba(15, 23, 42, 0.58);
+  color: #dbeafe;
+  border: 1px solid rgba(147, 197, 253, 0.28);
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.2s;
+  font-size: 1rem;
+  line-height: 1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
 }
 
 .toggleButton:hover {
-  background-color: rgba(0, 0, 0, 0.7);
-  border-color: white;
+  background-color: rgba(37, 99, 235, 0.28);
+  border-color: rgba(147, 197, 253, 0.55);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .navContent {
+    align-items: flex-start;
+    flex-direction: column;
+    padding-right: 4rem;
+  }
+
+  .navLinks {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.85rem;
+  }
+
+  .navLink,
+  .signInButton {
+    font-size: 0.95rem;
+  }
+
+  .toggleButton {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 32px;
+    height: 32px;
+  }
 }

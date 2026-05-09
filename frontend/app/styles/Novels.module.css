@@ -1,19 +1,17 @@
 .container {
   min-height: 100vh;
-  padding: 2rem;
-  background: #0d1117; /* Dark background */
-  color: #f0f0f0; /* Light text */
+  padding: clamp(2rem, 5vw, 4rem) 1.25rem;
+  color: #f0f0f0;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-family: sans-serif;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 6vw, 3.25rem);
   margin-bottom: 0.5rem;
-  color: #58a6ff; /* Accent blue */
+  color: #93c5fd;
 }
 
 .subtitle {
@@ -24,19 +22,23 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1.5rem;
   width: 100%;
   max-width: 1200px;
 }
 
 .card {
-  background: #161b22; /* Darker card */
+  background: #161b22;
   padding: 1.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   transition: transform 0.2s ease, box-shadow 0.3s ease;
-  text-align: center;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .card:hover {
@@ -47,7 +49,7 @@
 .card h2 {
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
-  color: #3B82F6; /* Tailwind-like blue */
+  color: #93c5fd;
 }
 
 .card p {
@@ -56,18 +58,46 @@
   margin-bottom: 0.5rem;
 }
 
+.authorLabel {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.description {
+  line-height: 1.6;
+  flex: 1;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.tag {
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 999px;
+  color: #bfdbfe;
+  background: rgba(59, 130, 246, 0.12);
+  padding: 0.28rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
 .button {
   display: inline-block;
   margin-top: 0.5rem;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  background: #03346E;
+  background: #2563eb;
   color: white;
   font-weight: 500;
   text-decoration: none;
   transition: background 0.2s ease;
+  align-self: flex-start;
 }
 
 .button:hover {
-  background: #1a4e9c;
+  background: #1d4ed8;
 }

@@ -1,7 +1,7 @@
 .container {
   max-width: 700px;
-  margin: 2rem auto;
-  padding: 2rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) 1.25rem;
   color: #e0e0e0;
 }
 
@@ -11,7 +11,7 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 6vw, 3rem);
   margin-bottom: 0.5rem;
 }
 
@@ -22,10 +22,10 @@
 
 /* Styles for the "Sign In" prompt */
 .signInPrompt {
-  background-color: #252525;
-  padding: 2rem;
+  background-color: #161b22;
+  padding: clamp(1.25rem, 5vw, 2rem);
   border-radius: 8px;
-  border: 1px solid #333;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   text-align: center;
 }
 
@@ -36,10 +36,10 @@
 
 /* Styles for the registration form */
 .form {
-  background-color: #252525;
-  padding: 2rem;
+  background-color: #161b22;
+  padding: clamp(1.25rem, 5vw, 2rem);
   border-radius: 8px;
-  border: 1px solid #333;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -54,8 +54,8 @@
 
 .input, .textarea {
   width: 100%;
-  background-color: #1e1e1e;
-  border: 1px solid #444;
+  background-color: #0d1117;
+  border: 1px solid rgba(148, 163, 184, 0.26);
   border-radius: 6px;
   padding: 0.75rem 1rem;
   color: #e0e0e0;
@@ -73,6 +73,7 @@
 .checkboxContainer {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -105,11 +106,11 @@
   transition: all 0.2s;
   cursor: pointer;
   border: 1px solid transparent;
-  background-color: #0070f3;
+  background-color: #2563eb;
   color: white;
 }
 .button:hover:not(:disabled) {
-  background-color: #005bb5;
+  background-color: #1d4ed8;
 }
 
 .button:disabled {
@@ -117,4 +118,15 @@
   border-color: #444;
   color: #888;
   cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .actions,
+  .button {
+    width: 100%;
+  }
+
+  .button {
+    text-align: center;
+  }
 }

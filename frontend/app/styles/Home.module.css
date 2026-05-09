@@ -1,81 +1,86 @@
 .container {
     min-height: 100vh;
-    padding: 2rem;
+    padding: clamp(2rem, 6vw, 5rem) 1.25rem 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: sans-serif;
+    color: #f8fafc;
   }
   
   .hero {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+    max-width: 760px;
   }
   
   .hero h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2.25rem, 8vw, 4.75rem);
+    line-height: 1;
     margin: 1rem 0 0.5rem;
+    color: #ffffff;
   }
   
   .hero p {
-    font-size: 1.1rem;
-    color: #555;
+    font-size: clamp(1rem, 2.4vw, 1.25rem);
+    color: #cbd5e1;
   }
   
   .main {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
     width: 100%;
-    max-width: 600px;
+    max-width: 900px;
   }
   
   .card {
-    background: #f9f9f9;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    text-align: center;
+    background: rgba(22, 27, 34, 0.88);
+    padding: clamp(1.35rem, 4vw, 2rem);
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.22);
+    text-align: left;
   }
   
   .card p {
     font-size: 1rem;
-    color: #333;
+    line-height: 1.6;
+    color: #cbd5e1;
     margin-bottom: 1.5rem;
   }
   
   .card h2 {
     margin-bottom: 1rem;
-    font-size: 2rem;
-    color: #03346E;
+    font-size: clamp(1.35rem, 4vw, 1.8rem);
+    color: #93c5fd;
   }
   
   .button, .buttonOutline {
     display: inline-block;
     margin-top: 1rem;
     padding: 0.7rem 1.5rem;
-    border-radius: 8px;
+    border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
     transition: 0.3s;
   }
   
   .button {
-    background-color: #03346E;
+    background-color: #2563eb;
     color: white;
   }
   
   .button:hover {
-    background-color: #1a4e9c;
+    background-color: #1d4ed8;
   }
   
   .buttonOutline {
-    border: 2px solid #03346E;
-    color: #03346E;
+    border: 1px solid #3b82f6;
+    color: #bfdbfe;
   }
   
   .buttonOutline:hover {
-    background-color: #03346E;
+    background-color: #2563eb;
     color: white;
   }
   
@@ -83,6 +88,12 @@
     margin-top: auto;
     padding: 2rem 0 1rem;
     font-size: 0.9rem;
-    color: #888;
+    color: #94a3b8;
+  }
+
+  @media (max-width: 720px) {
+    .main {
+      grid-template-columns: 1fr;
+    }
   }
   
