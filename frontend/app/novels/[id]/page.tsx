@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import styles from "../../styles/NovelDetails.module.css";
 import { notFound } from "next/navigation";
+import NovelLoreChat from "../../components/NovelLoreChat";
 
 export default async function NovelDetails({ params }: { params: Promise<{ id: string }> }) {
   // 1. Await the dynamic routing params
@@ -78,6 +79,10 @@ export default async function NovelDetails({ params }: { params: Promise<{ id: s
           <p>The author is still working on the first chapter!</p>
         )}
       </div>
+
+      {chapters && chapters.length > 0 && (
+        <NovelLoreChat novelId={id} />
+      )}
     </div>
   );
 }

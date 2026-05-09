@@ -5,6 +5,7 @@ import { auth } from "@/app/auth";
 import { supabase } from "@/app/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { GoogleGenAI } from '@google/genai'; // Added missing Gemini import
 
 /**
  * 1. CREATE NOVEL LOGIC
@@ -15,7 +16,6 @@ export async function createNovelAction(formData: FormData) {
 
   const userId = session.user.id;
 
-  // Verify the user has formally registered as an author
   const { data: author } = await supabase
     .from("authors")
     .select("id")
@@ -30,13 +30,11 @@ export async function createNovelAction(formData: FormData) {
   const description = formData.get("description") as string;
   const status = formData.get("status") as string || "Ongoing";
 
-  // 👇 THE FIX: Safely parse the tags string into an array
   const genresString = formData.get("genres") as string;
   const genreArray = genresString 
     ? genresString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
     : [];
 
-  // Insert the novel
   const { data, error } = await supabase
     .from("novels")
     .insert({
@@ -44,7 +42,7 @@ export async function createNovelAction(formData: FormData) {
       title,
       description,
       status,
-      genre: genreArray, // Save the array to the database!
+      genre: genreArray, 
     })
     .select('id')
     .single();
@@ -54,9 +52,8 @@ export async function createNovelAction(formData: FormData) {
     return { error: "Failed to create novel. Please try again." };
   }
 
-  // Clear cache and redirect to the new novel's dashboard
   revalidatePath("/author");
-  revalidatePath("/novels"); // Clear the public novels cache too!
+  revalidatePath("/novels"); 
   redirect(`/author/novels/${data.id}/add-chapter`);
 }
 
@@ -89,7 +86,7 @@ export async function registerAuthorAction(formData: FormData) {
 }
 
 /**
- * 3. ADD CHAPTER LOGIC 
+ * 3. ADD CHAPTER LOGIC (With Vector Generation)
  */
 export async function addChapterAction(novelId: string, formData: FormData) {
   const session = await auth();
@@ -103,19 +100,28 @@ export async function addChapterAction(novelId: string, formData: FormData) {
     .eq("id", novelId)
     .single();
 
-  if (novelError || !novel) {
-    throw new Error("Novel not found.");
-  }
-
-  if (novel.author_id !== userId) {
-    throw new Error("Unauthorized: You can only add chapters to your own novels.");
-  }
+  if (novelError || !novel) throw new Error("Novel not found.");
+  if (novel.author_id !== userId) throw new Error("Unauthorized: You can only add chapters to your own novels.");
 
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
   const chapterNumber = parseInt(formData.get("chapterNumber") as string);
   const isPublished = formData.get("isPublished") === "true";
 
+  // GENERATE THE VECTOR EMBEDDING
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const embeddingResponse = await ai.models.embedContent({
+    model: 'gemini-embedding-2',
+    contents: content.substring(0, 8000), 
+    // 👇 ADD THIS CONFIG BLOCK 👇
+    config: {
+      outputDimensionality: 768, 
+    }
+  });
+  
+  const embedding = embeddingResponse?.embeddings[0]?.values;
+
+  // SAVE TO DATABASE
   const { error: insertError } = await supabase
     .from("chapters")
     .insert({
@@ -124,6 +130,7 @@ export async function addChapterAction(novelId: string, formData: FormData) {
       content,
       chapter_number: chapterNumber,
       is_published: isPublished,
+      embedding: embedding, // Save the generated vector!
     });
 
   if (insertError) {
