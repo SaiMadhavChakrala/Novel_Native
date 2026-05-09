@@ -4,10 +4,10 @@ import Google from "next-auth/providers/google"
 import { createHmac } from "crypto";
 
 function getInternalUserId(provider: string, providerAccountId: string) {
-  const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+  const secret = process.env.AUTH_SECRET;
 
   if (!secret) {
-    throw new Error("AUTH_SECRET or NEXTAUTH_SECRET is required for stable user ids.");
+    throw new Error("AUTH_SECRET is required for stable user ids.");
   }
 
   return `${provider}:${createHmac("sha256", secret).update(providerAccountId).digest("hex")}`;
