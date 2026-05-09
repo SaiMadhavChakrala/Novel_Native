@@ -86,7 +86,20 @@ export async function registerAuthorAction(formData: FormData) {
 }
 
 /**
- * 3. ADD CHAPTER LOGIC (With Vector Generation)
+ * HELPER: Recursive-style Overlap Chunking Algorithm
+ */
+function getOverlapChunks(text: string, chunkSize = 1000, overlap = 200): string[] {
+  const chunks: string[] = [];
+  let i = 0;
+  while (i < text.length) {
+    chunks.push(text.slice(i, i + chunkSize));
+    i += (chunkSize - overlap); // Step forward, leaving the overlap behind
+  }
+  return chunks;
+}
+
+/**
+ * 3. ADD CHAPTER LOGIC (With Advanced Overlap Chunking)
  */
 export async function addChapterAction(novelId: string, formData: FormData) {
   const session = await auth();
@@ -108,21 +121,9 @@ export async function addChapterAction(novelId: string, formData: FormData) {
   const chapterNumber = parseInt(formData.get("chapterNumber") as string);
   const isPublished = formData.get("isPublished") === "true";
 
-  // GENERATE THE VECTOR EMBEDDING
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const embeddingResponse = await ai.models.embedContent({
-    model: 'gemini-embedding-2',
-    contents: content.substring(0, 8000), 
-    // 👇 ADD THIS CONFIG BLOCK 👇
-    config: {
-      outputDimensionality: 768, 
-    }
-  });
-  
-  const embedding = embeddingResponse?.embeddings[0]?.values;
-
-  // SAVE TO DATABASE
-  const { error: insertError } = await supabase
+  // 1. SAVE THE CHAPTER TEXT FIRST (So readers can read it)
+  // Notice we are no longer saving an embedding to the 'chapters' table
+  const { data: newChapter, error: insertError } = await supabase
     .from("chapters")
     .insert({
       novel_id: novelId,
@@ -130,12 +131,48 @@ export async function addChapterAction(novelId: string, formData: FormData) {
       content,
       chapter_number: chapterNumber,
       is_published: isPublished,
-      embedding: embedding, // Save the generated vector!
-    });
+    })
+    .select("id")
+    .single();
 
-  if (insertError) {
+  if (insertError || !newChapter) {
     console.error("Database Error:", insertError);
     throw new Error("Failed to add chapter. Does this chapter number already exist?");
+  }
+
+  // 2. SPLIT TEXT INTO 1000-CHAR CHUNKS WITH 200-CHAR OVERLAP
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const textChunks = getOverlapChunks(content, 1000, 200);
+  const chunkInserts = [];
+
+  // 3. GENERATE VECTORS FOR EVERY SINGLE CHUNK
+  for (let i = 0; i < textChunks.length; i++) {
+    const chunkText = textChunks[i];
+    
+    // Generate the vector for just this 1000-character slice
+    const embeddingResponse = await ai.models.embedContent({
+      model: 'gemini-embedding-2',
+      contents: chunkText, 
+      config: { outputDimensionality: 768 }
+    });
+    
+    // Prep it for the database
+    chunkInserts.push({
+      novel_id: novelId,
+      chapter_id: newChapter.id, // Link this chunk back to the main chapter
+      chunk_index: i,
+      content: chunkText,
+      embedding: embeddingResponse.embeddings[0].values, 
+    });
+  }
+
+  // 4. BATCH INSERT ALL CHUNKS INTO THE NEW TABLE
+  const { error: chunkError } = await supabase
+    .from("chapter_chunks")
+    .insert(chunkInserts);
+
+  if (chunkError) {
+    console.error("Chunking Database Error:", chunkError);
   }
 
   revalidatePath(`/novels/${novelId}`);
