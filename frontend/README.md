@@ -34,11 +34,8 @@ Add these Environment Variables in Vercel for Production, Preview, and Developme
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `AUTH_SECRET`
-- `AUTH_URL`
-- `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL`
 
-For local development, `AUTH_URL` and `NEXTAUTH_URL` are usually `http://localhost:3000`. In Vercel, set them to the deployed site URL, for example `https://your-project.vercel.app`.
+Auth.js can infer the deployment URL on Vercel. Only set `AUTH_URL` if you have a custom auth base path or a specific proxy setup.
 
 In Google Cloud Console, add the matching OAuth redirect URI:
 
