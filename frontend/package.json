@@ -9,8 +9,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:deployment": "EVAL_ALLOW_GEMINI_FAILURES=true npm run test:deployment && npm run build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:deployment": "node eval.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.0.1",
