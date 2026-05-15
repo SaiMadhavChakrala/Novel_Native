@@ -15,6 +15,14 @@ interface AuthorNovel {
   chapters?: { count: number }[];
 }
 
+interface DraftChapter {
+  id: string;
+  novel_id: string;
+  chapter_number: number;
+  title: string;
+  updated_at: string;
+}
+
 export default async function AuthorDashboard() {
   // Fetch the user's session
   const session = await auth();
@@ -37,6 +45,26 @@ export default async function AuthorDashboard() {
   if (error) {
     console.error("Error fetching author novels:", error);
   }
+
+  const novelIds = ((authorNovels || []) as AuthorNovel[]).map((novel) => novel.id);
+  const { data: draftChapters, error: draftError } = novelIds.length > 0
+    ? await supabase
+        .from("chapters")
+        .select("id, novel_id, chapter_number, title, updated_at")
+        .in("novel_id", novelIds)
+        .eq("is_published", false)
+        .order("updated_at", { ascending: false })
+    : { data: [], error: null };
+
+  if (draftError) {
+    console.error("Error fetching draft chapters:", draftError);
+  }
+
+  const draftsByNovel = ((draftChapters || []) as DraftChapter[]).reduce<Record<string, DraftChapter[]>>((drafts, chapter) => {
+    drafts[chapter.novel_id] = drafts[chapter.novel_id] || [];
+    drafts[chapter.novel_id].push(chapter);
+    return drafts;
+  }, {});
 
   return (
     <div className={styles.container}>
@@ -61,6 +89,7 @@ export default async function AuthorDashboard() {
           (authorNovels as AuthorNovel[]).map((novel) => {
             // Supabase returns related counts in an array like: [{ count: 5 }]
             const chapterCount = novel.chapters?.[0]?.count || 0;
+            const novelDrafts = draftsByNovel[novel.id] || [];
 
             return (
               <div key={novel.id} className={styles.card}>
@@ -80,6 +109,40 @@ export default async function AuthorDashboard() {
                 <p>
                   <strong>Total Chapters:</strong> {chapterCount}
                 </p>
+
+                {novelDrafts.length > 0 && (
+                  <div className={styles.drafts}>
+                    <div className={styles.draftsHeader}>
+                      <h4>Drafts</h4>
+                      <span>{novelDrafts.length}</span>
+                    </div>
+
+                    <div className={styles.draftsList}>
+                      {novelDrafts.map((draft) => (
+                        <div key={draft.id} className={styles.draftItem}>
+                          <div>
+                            <p className={styles.draftTitle}>
+                              Chapter {draft.chapter_number}: {draft.title}
+                            </p>
+                            <p className={styles.draftMeta}>
+                              Updated {new Intl.DateTimeFormat("en", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              }).format(new Date(draft.updated_at))}
+                            </p>
+                          </div>
+                          <Link
+                            href={`/author/novels/${novel.id}/chapters/${draft.id}/edit`}
+                            className={styles.smallButton}
+                          >
+                            Continue Editing
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className={styles.actions}>
                   <Link

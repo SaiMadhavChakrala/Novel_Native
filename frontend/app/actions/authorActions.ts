@@ -119,6 +119,39 @@ function getEmbeddingValues(embeddingResponse: Awaited<ReturnType<GoogleGenAI["m
   return values;
 }
 
+async function createChapterChunks(novelId: string, chapterId: string, content: string) {
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const textChunks = getOverlapChunks(content, 1000, 200);
+  const chunkInserts = [];
+
+  for (let i = 0; i < textChunks.length; i++) {
+    const chunkText = textChunks[i];
+
+    const embeddingResponse = await ai.models.embedContent({
+      model: 'gemini-embedding-2',
+      contents: chunkText,
+      config: { outputDimensionality: 768 }
+    });
+
+    chunkInserts.push({
+      novel_id: novelId,
+      chapter_id: chapterId,
+      chunk_index: i,
+      content: chunkText,
+      embedding: getEmbeddingValues(embeddingResponse),
+    });
+  }
+
+  const { error: chunkError } = await supabase
+    .from("chapter_chunks")
+    .insert(chunkInserts);
+
+  if (chunkError) {
+    console.error("Chunking Database Error:", chunkError);
+    throw new Error("Chapter was saved, but failed to index for lore chat.");
+  }
+}
+
 /**
  * 3. ADD CHAPTER LOGIC (With Advanced Overlap Chunking)
  */
@@ -186,41 +219,100 @@ export async function addChapterAction(novelId: string, formData: FormData) {
   }
 
   // 2. SPLIT TEXT INTO 1000-CHAR CHUNKS WITH 200-CHAR OVERLAP
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-  const textChunks = getOverlapChunks(content, 1000, 200);
-  const chunkInserts = [];
-
-  // 3. GENERATE VECTORS FOR EVERY SINGLE CHUNK
-  for (let i = 0; i < textChunks.length; i++) {
-    const chunkText = textChunks[i];
-    
-    // Generate the vector for just this 1000-character slice
-    const embeddingResponse = await ai.models.embedContent({
-      model: 'gemini-embedding-2',
-      contents: chunkText, 
-      config: { outputDimensionality: 768 }
-    });
-    
-    // Prep it for the database
-    chunkInserts.push({
-      novel_id: novelId,
-      chapter_id: newChapter.id, // Link this chunk back to the main chapter
-      chunk_index: i,
-      content: chunkText,
-      embedding: getEmbeddingValues(embeddingResponse), 
-    });
-  }
-
-  // 4. BATCH INSERT ALL CHUNKS INTO THE NEW TABLE
-  const { error: chunkError } = await supabase
-    .from("chapter_chunks")
-    .insert(chunkInserts);
-
-  if (chunkError) {
-    console.error("Chunking Database Error:", chunkError);
-  }
+  await createChapterChunks(novelId, newChapter.id, content);
 
   revalidatePath(`/novels/${novelId}`);
   revalidatePath(`/author`);
+  redirect(`/novels/${novelId}`);
+}
+
+/**
+ * 4. UPDATE DRAFT CHAPTER LOGIC
+ */
+export async function updateDraftChapterAction(novelId: string, chapterId: string, formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("You must be logged in.");
+
+  const userId = session.user.id;
+  const authorIds = getSessionAuthorIds(session);
+
+  await syncAuthorIdentity(session);
+
+  const { data: novel, error: novelError } = await supabase
+    .from("novels")
+    .select("author_id")
+    .eq("id", novelId)
+    .single();
+
+  if (novelError || !novel) throw new Error("Novel not found.");
+  if (!authorIds.includes(novel.author_id)) throw new Error("Unauthorized: You can only edit your own novels.");
+
+  if (novel.author_id !== userId) {
+    await supabase
+      .from("novels")
+      .update({ author_id: userId })
+      .eq("id", novelId);
+  }
+
+  const { data: existingChapter, error: chapterError } = await supabase
+    .from("chapters")
+    .select("id, is_published")
+    .eq("id", chapterId)
+    .eq("novel_id", novelId)
+    .single();
+
+  if (chapterError || !existingChapter) throw new Error("Draft chapter not found.");
+  if (existingChapter.is_published) throw new Error("Published chapters cannot be edited from the draft editor.");
+
+  const title = formData.get("title") as string;
+  const content = formData.get("content") as string;
+  const chapterNumber = parseInt(formData.get("chapterNumber") as string);
+  const shouldPublish = formData.get("intent") === "publish";
+
+  if (!Number.isInteger(chapterNumber) || chapterNumber < 1) {
+    throw new Error("Chapter number must be a positive whole number.");
+  }
+
+  if (content.length > MAX_CHAPTER_CONTENT_LENGTH) {
+    throw new Error(`Chapter content must be ${MAX_CHAPTER_CONTENT_LENGTH} characters or fewer.`);
+  }
+
+  const { error: updateError } = await supabase
+    .from("chapters")
+    .update({
+      title,
+      content,
+      chapter_number: chapterNumber,
+      is_published: shouldPublish,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", chapterId)
+    .eq("novel_id", novelId);
+
+  if (updateError) {
+    console.error("Draft Update Database Error:", updateError);
+    throw new Error("Failed to update draft. Does this chapter number already exist?");
+  }
+
+  if (!shouldPublish) {
+    revalidatePath("/author");
+    revalidatePath(`/author/novels/${novelId}/chapters/${chapterId}/edit`);
+    redirect("/author");
+  }
+
+  const { error: deleteChunksError } = await supabase
+    .from("chapter_chunks")
+    .delete()
+    .eq("chapter_id", chapterId);
+
+  if (deleteChunksError) {
+    console.error("Chunk Cleanup Database Error:", deleteChunksError);
+    throw new Error("Chapter was saved, but failed to refresh lore chat indexing.");
+  }
+
+  await createChapterChunks(novelId, chapterId, content);
+
+  revalidatePath("/author");
+  revalidatePath(`/novels/${novelId}`);
   redirect(`/novels/${novelId}`);
 }
