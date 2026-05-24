@@ -2,24 +2,25 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import styles from "../../../styles/BrowseChapters.module.css";
 import { notFound } from "next/navigation";
+import { auth } from "@/app/auth";
+import { getAccessiblePublishedChapters } from "@/app/lib/userAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function BrowseChaptersPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const session = await auth();
 
   // Fetch just the title to display in the header
   const { data: novel } = await supabase.from("novels").select("title").eq("id", id).single();
   
   if (!novel) return notFound();
 
-  // Fetch chapters
-  const { data: chapters } = await supabase
-    .from("chapters")
-    .select("chapter_number, title")
-    .eq("novel_id", id)
-    .eq("is_published", true)
-    .order("chapter_number", { ascending: true });
+  const {
+    accessibleChapters: chapters,
+    totalPublishedChapters,
+    lockedChapterCount,
+  } = await getAccessiblePublishedChapters(id, session);
 
   return (
     <div className={styles.container}>
@@ -30,7 +31,9 @@ export default async function BrowseChaptersPage({ params }: { params: Promise<{
         </Link>
       </header>
       
-      <p className={styles.subtitle}>Browse all available chapters</p>
+      <p className={styles.subtitle}>
+        Browse {chapters.length} of {totalPublishedChapters} available chapters
+      </p>
 
       <div className={styles.listContainer}>
         {!chapters || chapters.length === 0 ? (
@@ -45,6 +48,14 @@ export default async function BrowseChaptersPage({ params }: { params: Promise<{
                 </Link>
               </li>
             ))}
+            {lockedChapterCount > 0 && (
+              <li className={styles.listItem}>
+                <span className={styles.chapterNumber}>Locked</span>
+                <span className={styles.chapterTitle}>
+                  {lockedChapterCount} premium chapter{lockedChapterCount === 1 ? "" : "s"}
+                </span>
+              </li>
+            )}
           </ul>
         )}
       </div>

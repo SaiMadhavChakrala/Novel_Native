@@ -1,130 +1,90 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/app/lib/supabase";
+import { notFound } from "next/navigation";
+import { auth } from "@/app/auth";
+import ChapterReader from "@/app/components/ChapterReader";
+import { getSupabaseAdmin } from "@/app/lib/supabaseAdmin";
+import { getAccessiblePublishedChapters } from "@/app/lib/userAccess";
 import styles from "../../../../styles/Chapter.module.css";
 
-interface ChapterData {
-  title: string;
-  content: string;
+export const dynamic = "force-dynamic";
+
+interface ChapterPageProps {
+  params: Promise<{
+    id: string;
+    chapter: string;
+  }>;
 }
 
-interface ChapterNavItem {
-  chapter_number: number;
-}
+export default async function ChapterPage({ params }: ChapterPageProps) {
+  const { id, chapter } = await params;
+  const chapterNumber = Number.parseInt(chapter, 10);
 
-export default function ChapterPage() {
-  const params = useParams();
-  const id = params?.id as string;
-  const chapterNumber = parseInt(params?.chapter as string);
+  if (!Number.isInteger(chapterNumber) || chapterNumber < 1) {
+    return notFound();
+  }
 
-  // States for DB Data
-  const [chapterData, setChapterData] = useState<ChapterData | null>(null);
-  const [previousChapter, setPreviousChapter] = useState<number | null>(null);
-  const [nextChapter, setNextChapter] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const session = await auth();
+  const {
+    publishedChapters,
+    accessibleChapters,
+    totalPublishedChapters,
+    visibleChapterCount,
+  } = await getAccessiblePublishedChapters(id, session);
 
-  // States for UI
-  const [opacity, setOpacity] = useState(0.25);
-  const [isPlainText, setIsPlainText] = useState(false);
+  const publishedChapterNumbers = publishedChapters.map((item) => item.chapter_number);
+  const accessibleChapterNumbers = accessibleChapters.map((item) => item.chapter_number);
 
-  useEffect(() => {
-    if (!id || !chapterNumber) return;
+  if (!publishedChapterNumbers.includes(chapterNumber)) {
+    return notFound();
+  }
 
-    async function fetchChapter() {
-      setLoading(true);
-      // Fetch the specific chapter
-      const { data } = await supabase
-        .from("chapters")
-        .select("title, content")
-        .eq("novel_id", id)
-        .eq("chapter_number", chapterNumber)
-        .eq("is_published", true)
-        .single();
+  if (!accessibleChapterNumbers.includes(chapterNumber)) {
+    return (
+      <div className={`${styles.container} ${styles.plainTextContainer}`}>
+        <div className={styles.contentWrapper}>
+          <header className={styles.header}>
+            <Link href={`/novels/${id}`} className={styles.backToNovelLink}>
+              Back to Novel
+            </Link>
+            <h1>Premium Chapter</h1>
+          </header>
+          <article className={styles.plainTextContent}>
+            <p>
+              This chapter is outside your current plan. Normal readers can access the first{" "}
+              {visibleChapterCount} of {totalPublishedChapters} published chapters.
+            </p>
+          </article>
+        </div>
+      </div>
+    );
+  }
 
-      // Fetch published chapter numbers so draft gaps do not break previous/next links.
-      const { data: publishedChapters } = await supabase
-        .from("chapters")
-        .select("chapter_number")
-        .eq("novel_id", id)
-        .eq("is_published", true)
-        .order("chapter_number", { ascending: true });
+  const currentIndex = accessibleChapterNumbers.indexOf(chapterNumber);
+  const previousChapter = currentIndex > 0 ? accessibleChapterNumbers[currentIndex - 1] : null;
+  const nextChapter = currentIndex >= 0 && currentIndex < accessibleChapterNumbers.length - 1
+    ? accessibleChapterNumbers[currentIndex + 1]
+    : null;
 
-      const chapterNumbers = ((publishedChapters || []) as ChapterNavItem[]).map((chapter) => chapter.chapter_number);
-      const currentIndex = chapterNumbers.indexOf(chapterNumber);
+  const { data: chapterData, error } = await getSupabaseAdmin()
+    .from("chapters")
+    .select("title, content")
+    .eq("novel_id", id)
+    .eq("chapter_number", chapterNumber)
+    .eq("is_published", true)
+    .single();
 
-      setChapterData(data);
-      setPreviousChapter(currentIndex > 0 ? chapterNumbers[currentIndex - 1] : null);
-      setNextChapter(currentIndex >= 0 && currentIndex < chapterNumbers.length - 1 ? chapterNumbers[currentIndex + 1] : null);
-      setLoading(false);
-    }
-
-    fetchChapter();
-  }, [id, chapterNumber]);
-
-  if (loading) return <div className={styles.container} style={{ textAlign: "center", padding: "5rem" }}>Loading Chapter...</div>;
-  if (!chapterData) return <div className={styles.container} style={{ textAlign: "center", padding: "5rem" }}>Chapter not found.</div>;
+  if (error || !chapterData) {
+    return notFound();
+  }
 
   return (
-    <div
-      className={`${styles.container} ${isPlainText ? styles.plainTextContainer : ""}`}
-      style={!isPlainText ? { backgroundImage: `url(/images/chained_iles.jpg)` } : {}}
-    >
-      {!isPlainText && <div className={styles.overlay}></div>}
-      <div className={styles.contentWrapper}>
-        <header className={styles.header}>
-          <Link href={`/novels/${id}`} className={styles.backToNovelLink}>
-            ← Back to Novel
-          </Link>
-          <h1>Chapter {chapterNumber}: {chapterData.title}</h1>
-          
-          <button 
-            onClick={() => setIsPlainText(!isPlainText)}
-            className={`${styles.toggleButton} ${isPlainText ? styles.active : ""}`}
-          >
-            {isPlainText ? "View Picture Mode" : "Read Only Text"}
-          </button>
-        </header>
-        
-        <article
-          className={`${styles.content} ${isPlainText ? styles.plainTextContent : ""}`}
-          style={!isPlainText ? { backgroundColor: `rgba(10, 10, 10, ${opacity})` } : {}}
-        >
-          {/* CRITICAL FIX: whiteSpace 'pre-wrap' forces HTML to respect database line breaks! */}
-          <p style={{ whiteSpace: "pre-wrap", lineHeight: "1.8" }}>{chapterData.content}</p>
-        </article>
-        
-        <footer className={styles.footer}>
-          {!isPlainText && (
-            <div className={styles.settingsControl}>
-              <span>Background Opacity</span>
-              <input
-                type="range"
-                min="0"
-                max="0.9"
-                step="0.05"
-                value={opacity}
-                onChange={(e) => setOpacity(parseFloat(e.target.value))}
-              />
-            </div>
-          )}
-
-          <div className={styles.navButtons}>
-            {previousChapter && (
-              <Link href={`/novels/${id}/chapters/${previousChapter}`} className={styles.buttonOutline}>
-                ← Previous
-              </Link>
-            )}
-            {nextChapter && (
-              <Link href={`/novels/${id}/chapters/${nextChapter}`} className={styles.button}>
-                Next →
-              </Link>
-            )}
-          </div>
-        </footer>
-      </div>
-    </div>
+    <ChapterReader
+      novelId={id}
+      chapterNumber={chapterNumber}
+      title={chapterData.title}
+      content={chapterData.content}
+      previousChapter={previousChapter}
+      nextChapter={nextChapter}
+    />
   );
 }

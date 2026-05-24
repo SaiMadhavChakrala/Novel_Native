@@ -50,7 +50,7 @@ export default function NovelLoreChat({ novelId }: { novelId: string }) {
     <div className={styles.chatBox}>
       <h3 className={styles.title}>🧠 Ask the Lore-Master</h3>
       <p className={styles.intro}>
-        Forget a character&apos;s name or a piece of lore? Ask the AI to search the published chapters!
+        Forget a character&apos;s name or a piece of lore? Ask the AI to search the chapters available to you.
       </p>
       
       <form onSubmit={askQuestion} className={styles.form}>
@@ -58,7 +58,7 @@ export default function NovelLoreChat({ novelId }: { novelId: string }) {
           type="text" 
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="e.g. What is the name of the artifact in the goblin cave?" 
+          placeholder="e.g. What is the name of the artifact?" 
           className={styles.input}
         />
         <button 

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type, Schema } from '@google/genai';
-import { supabase } from '@/app/lib/supabase';
+import { auth } from '@/app/auth';
+import { getSupabaseAdmin } from '@/app/lib/supabaseAdmin';
+import { getNovelAccess } from '@/app/lib/userAccess';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -15,8 +17,26 @@ function getEmbeddingValues(embeddingResponse: Awaited<ReturnType<GoogleGenAI["m
 }
 
 interface MatchedChapter {
+  id: string;
   title: string;
   content: string;
+  rrf_score: number;
+}
+
+interface HybridSearchRpcClient {
+  rpc(
+    functionName: "hybrid_search_chapters",
+    args: {
+      query_text: string;
+      query_embedding: number[];
+      match_count: number;
+      search_novel_id: string;
+      accessible_chapter_count: number | null;
+    }
+  ): Promise<{
+    data: MatchedChapter[] | null;
+    error: { message: string } | null;
+  }>;
 }
 
 // Enforce a strict JSON structure for the AI to return
@@ -46,10 +66,18 @@ export async function POST(req: Request) {
   try {
     const { question, novelId } = await req.json();
 
+    if (typeof question !== "string" || !question.trim() || typeof novelId !== "string") {
+      return NextResponse.json({ error: "Question and novelId are required." }, { status: 400 });
+    }
+
+    const session = await auth();
+    const access = await getNovelAccess(novelId, session);
+    const supabase = getSupabaseAdmin() as unknown as HybridSearchRpcClient;
+
     // 1. Generate query embedding (Updated model and dimensionality config)
     const embeddingResponse = await ai.models.embedContent({
       model: 'gemini-embedding-2', 
-      contents: question,
+      contents: question.trim(),
       config: {
         outputDimensionality: 768, 
       }
@@ -60,16 +88,27 @@ export async function POST(req: Request) {
 
     // 2. Hybrid Search (Vector + Keyword) & RRF Reranking
     const { data: matchedChapters, error } = await supabase.rpc('hybrid_search_chapters', {
-      query_text: question,
+      query_text: question.trim(),
       query_embedding: queryEmbedding,
       match_count: 3, 
       search_novel_id: novelId,
+      accessible_chapter_count: access.accessibleChapterCount,
     });
 
     if (error || !matchedChapters || matchedChapters.length === 0) {
       // 👇 ADD THIS LINE SO WE CAN SEE THE CRASH IN THE TERMINAL 👇
       console.error("SUPABASE RETRIEVAL ERROR:", error); 
-      return NextResponse.json({ answer: "I couldn't find any relevant lore in the chapters.", citations: [] });
+      const normalPlanMessage = access.lockedChapterCount > 0
+        ? `I couldn't find that in the first ${access.visibleChapterCount} of ${access.totalPublishedChapters} published chapters available to your plan.`
+        : "I couldn't find any relevant lore in the chapters currently available to you.";
+
+      return NextResponse.json({
+        answer: access.plan === "premium"
+          ? "I couldn't find any relevant lore in the published chapters."
+          : normalPlanMessage,
+        citations: [],
+        access,
+      });
     }
 
     // 3. Format Context
@@ -77,7 +116,7 @@ export async function POST(req: Request) {
       .map((ch) => `[Chapter: ${ch.title}]\n${ch.content}`)
       .join("\n\n---\n\n");
 
-    const prompt = `You are an enterprise-grade document assistant. Answer the user's question using ONLY the provided context. You MUST provide exact string quotes from the text as citations to prove your answer.\n\nContext:\n${contextText}\n\nQuestion: ${question}`;
+    const prompt = `You are an enterprise-grade document assistant for a ${access.plan} reader. Answer the user's question using ONLY the provided context. Do not infer from chapters outside this context. You MUST provide exact string quotes from the text as citations to prove your answer.\n\nContext:\n${contextText}\n\nQuestion: ${question.trim()}`;
 
     // 4. Generate with Strict Schema Enforcement
     const completion = await ai.models.generateContent({
@@ -93,7 +132,7 @@ export async function POST(req: Request) {
     // Parse the JSON result
     const result = JSON.parse(completion.text!);
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, access });
     
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";

@@ -38,6 +38,7 @@ async function runEvaluation() {
       query_embedding: queryEmbedding, 
       match_count: 3, 
       search_novel_id: test.novelId,
+      accessible_chapter_count: null,
     });
 
     if (error || !matchedChapters || matchedChapters.length === 0) {

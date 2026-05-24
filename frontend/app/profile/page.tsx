@@ -2,12 +2,14 @@ import { signIn, signOut, auth } from "../auth";
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import { syncAuthorIdentity } from "@/app/lib/authorIdentity";
+import { getUserPlan } from "@/app/lib/userAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const session = await auth();
   let isAuthor = false;
+  const userPlan = await getUserPlan(session);
 
   // If logged in, check if they are in the 'authors' database
   if (session?.user?.id) {
@@ -39,6 +41,9 @@ export default async function ProfilePage() {
             <div>
               <p className="text-2xl font-semibold">Welcome, {session.user.name}!</p>
               <p className="text-gray-400 mt-1">{session.user.email}</p>
+              <p className="text-sm uppercase tracking-wide text-blue-300 mt-3">
+                {userPlan} plan
+              </p>
             </div>
 
             <div className="pt-4 border-t border-[#333] space-y-4">
