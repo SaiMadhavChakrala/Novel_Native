@@ -1,0 +1,324 @@
+{
+    "tables": [
+        {
+            "columns": [
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "id",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "pen_name",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "bio",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "avatar_url",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "timestamptz",
+                    "data_type": "timestamp with time zone",
+                    "column_name": "created_at",
+                    "is_nullable": "YES",
+                    "column_default": "now()"
+                }
+            ],
+            "table_name": "authors"
+        },
+        {
+            "columns": [
+                {
+                    "udt_name": "uuid",
+                    "data_type": "uuid",
+                    "column_name": "id",
+                    "is_nullable": "NO",
+                    "column_default": "gen_random_uuid()"
+                },
+                {
+                    "udt_name": "uuid",
+                    "data_type": "uuid",
+                    "column_name": "novel_id",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "uuid",
+                    "data_type": "uuid",
+                    "column_name": "chapter_id",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "int4",
+                    "data_type": "integer",
+                    "column_name": "chunk_index",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "content",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "vector",
+                    "data_type": "USER-DEFINED",
+                    "column_name": "embedding",
+                    "is_nullable": "YES",
+                    "column_default": null
+                }
+            ],
+            "table_name": "chapter_chunks"
+        },
+        {
+            "columns": [
+                {
+                    "udt_name": "uuid",
+                    "data_type": "uuid",
+                    "column_name": "id",
+                    "is_nullable": "NO",
+                    "column_default": "gen_random_uuid()"
+                },
+                {
+                    "udt_name": "uuid",
+                    "data_type": "uuid",
+                    "column_name": "novel_id",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "int4",
+                    "data_type": "integer",
+                    "column_name": "chapter_number",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "title",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "content",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "bool",
+                    "data_type": "boolean",
+                    "column_name": "is_published",
+                    "is_nullable": "YES",
+                    "column_default": "false"
+                },
+                {
+                    "udt_name": "timestamptz",
+                    "data_type": "timestamp with time zone",
+                    "column_name": "created_at",
+                    "is_nullable": "YES",
+                    "column_default": "now()"
+                },
+                {
+                    "udt_name": "timestamptz",
+                    "data_type": "timestamp with time zone",
+                    "column_name": "updated_at",
+                    "is_nullable": "YES",
+                    "column_default": "now()"
+                },
+                {
+                    "udt_name": "vector",
+                    "data_type": "USER-DEFINED",
+                    "column_name": "embedding",
+                    "is_nullable": "YES",
+                    "column_default": null
+                }
+            ],
+            "table_name": "chapters"
+        },
+        {
+            "columns": [
+                {
+                    "udt_name": "uuid",
+                    "data_type": "uuid",
+                    "column_name": "id",
+                    "is_nullable": "NO",
+                    "column_default": "gen_random_uuid()"
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "author_id",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "title",
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "description",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "cover_url",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "text",
+                    "data_type": "text",
+                    "column_name": "status",
+                    "is_nullable": "YES",
+                    "column_default": "'Ongoing'::text"
+                },
+                {
+                    "udt_name": "_text",
+                    "data_type": "ARRAY",
+                    "column_name": "genre",
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "udt_name": "timestamptz",
+                    "data_type": "timestamp with time zone",
+                    "column_name": "created_at",
+                    "is_nullable": "YES",
+                    "column_default": "now()"
+                },
+                {
+                    "udt_name": "timestamptz",
+                    "data_type": "timestamp with time zone",
+                    "column_name": "updated_at",
+                    "is_nullable": "YES",
+                    "column_default": "now()"
+                }
+            ],
+            "table_name": "novels"
+        }
+    ],
+    "indexes": [
+        {
+            "definition": "CREATE UNIQUE INDEX authors_pkey ON public.authors USING btree (id)",
+            "index_name": "authors_pkey",
+            "table_name": "authors"
+        },
+        {
+            "definition": "CREATE UNIQUE INDEX chapter_chunks_pkey ON public.chapter_chunks USING btree (id)",
+            "index_name": "chapter_chunks_pkey",
+            "table_name": "chapter_chunks"
+        },
+        {
+            "definition": "CREATE UNIQUE INDEX chapters_novel_id_chapter_number_key ON public.chapters USING btree (novel_id, chapter_number)",
+            "index_name": "chapters_novel_id_chapter_number_key",
+            "table_name": "chapters"
+        },
+        {
+            "definition": "CREATE UNIQUE INDEX chapters_pkey ON public.chapters USING btree (id)",
+            "index_name": "chapters_pkey",
+            "table_name": "chapters"
+        },
+        {
+            "definition": "CREATE INDEX idx_chapters_novel_id ON public.chapters USING btree (novel_id)",
+            "index_name": "idx_chapters_novel_id",
+            "table_name": "chapters"
+        },
+        {
+            "definition": "CREATE UNIQUE INDEX novels_pkey ON public.novels USING btree (id)",
+            "index_name": "novels_pkey",
+            "table_name": "novels"
+        }
+    ],
+    "policies": null,
+    "functions": [
+        {
+            "returns": "TABLE(id uuid, title text, content text, rrf_score double precision)",
+            "arguments": "query_text text, query_embedding vector, match_count integer, search_novel_id uuid",
+            "definition": "CREATE OR REPLACE FUNCTION public.hybrid_search_chapters(query_text text, query_embedding vector, match_count integer, search_novel_id uuid)\n RETURNS TABLE(id uuid, title text, content text, rrf_score double precision)\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n  RETURN QUERY\n  WITH semantic_search AS (\n    -- Search the chunks, not the chapters\n    SELECT chunk.id, RANK() OVER (ORDER BY chunk.embedding <=> query_embedding) as semantic_rank\n    FROM chapter_chunks chunk\n    WHERE chunk.novel_id = search_novel_id\n    LIMIT 20\n  ),\n  keyword_search AS (\n    -- Keyword search the chunks\n    SELECT chunk.id, RANK() OVER (ORDER BY ts_rank(to_tsvector('english', chunk.content), plainto_tsquery('english', query_text)) DESC) as keyword_rank\n    FROM chapter_chunks chunk\n    WHERE chunk.novel_id = search_novel_id\n      AND to_tsvector('english', chunk.content) @@ plainto_tsquery('english', query_text)\n    LIMIT 20\n  )\n  SELECT\n    c.id,\n    ch.title, -- Join back to the chapters table to get the real chapter title for citations\n    c.content,\n    (COALESCE(1.0 / (60 + ss.semantic_rank), 0.0) + COALESCE(1.0 / (60 + ks.keyword_rank), 0.0))::float AS rrf_score\n  FROM chapter_chunks c\n  JOIN chapters ch ON c.chapter_id = ch.id \n  LEFT JOIN semantic_search ss ON c.id = ss.id\n  LEFT JOIN keyword_search ks ON c.id = ks.id\n  WHERE (ss.id IS NOT NULL OR ks.id IS NOT NULL)\n    AND c.novel_id = search_novel_id\n  ORDER BY rrf_score DESC\n  LIMIT match_count;\nEND;\n$function$\n",
+            "function_name": "hybrid_search_chapters"
+        }
+    ],
+    "constraints": [
+        {
+            "definition": "PRIMARY KEY (id)",
+            "table_name": "authors",
+            "constraint_name": "authors_pkey",
+            "constraint_type": "PRIMARY KEY"
+        },
+        {
+            "definition": "FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE",
+            "table_name": "chapter_chunks",
+            "constraint_name": "chapter_chunks_chapter_id_fkey",
+            "constraint_type": "FOREIGN KEY"
+        },
+        {
+            "definition": "FOREIGN KEY (novel_id) REFERENCES novels(id) ON DELETE CASCADE",
+            "table_name": "chapter_chunks",
+            "constraint_name": "chapter_chunks_novel_id_fkey",
+            "constraint_type": "FOREIGN KEY"
+        },
+        {
+            "definition": "PRIMARY KEY (id)",
+            "table_name": "chapter_chunks",
+            "constraint_name": "chapter_chunks_pkey",
+            "constraint_type": "PRIMARY KEY"
+        },
+        {
+            "definition": "UNIQUE (novel_id, chapter_number)",
+            "table_name": "chapters",
+            "constraint_name": "chapters_novel_id_chapter_number_key",
+            "constraint_type": "UNIQUE"
+        },
+        {
+            "definition": "FOREIGN KEY (novel_id) REFERENCES novels(id) ON DELETE CASCADE",
+            "table_name": "chapters",
+            "constraint_name": "chapters_novel_id_fkey",
+            "constraint_type": "FOREIGN KEY"
+        },
+        {
+            "definition": "PRIMARY KEY (id)",
+            "table_name": "chapters",
+            "constraint_name": "chapters_pkey",
+            "constraint_type": "PRIMARY KEY"
+        },
+        {
+            "definition": "FOREIGN KEY (author_id) REFERENCES authors(id) ON DELETE CASCADE",
+            "table_name": "novels",
+            "constraint_name": "novels_author_id_fkey",
+            "constraint_type": "FOREIGN KEY"
+        },
+        {
+            "definition": "PRIMARY KEY (id)",
+            "table_name": "novels",
+            "constraint_name": "novels_pkey",
+            "constraint_type": "PRIMARY KEY"
+        }
+    ]
+}
