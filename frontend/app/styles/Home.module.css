@@ -56,13 +56,18 @@
   }
   
   .button, .buttonOutline {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     margin-top: 1rem;
     padding: 0.7rem 1.5rem;
     border-radius: 6px;
     text-decoration: none;
     font-weight: bold;
     transition: 0.3s;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font: inherit;
   }
   
   .button {
