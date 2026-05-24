@@ -3,6 +3,8 @@ import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import { createHmac } from "crypto";
 
+const SESSION_MAX_AGE_SECONDS = 24 * 60 * 60;
+
 function uniqueStrings(values: Array<string | null | undefined>) {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value))));
 }
@@ -20,6 +22,12 @@ function getInternalUserId(provider: string, providerAccountId: string) {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   trustHost: true,
+  session: {
+    maxAge: SESSION_MAX_AGE_SECONDS,
+  },
+  jwt: {
+    maxAge: SESSION_MAX_AGE_SECONDS,
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,

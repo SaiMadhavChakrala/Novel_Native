@@ -1,0 +1,94 @@
+.shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 5rem 1.25rem 2rem;
+  color: #f8fafc;
+}
+
+.loader {
+  width: min(100%, 380px);
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.brand {
+  color: #93c5fd;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.ring {
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid rgba(148, 163, 184, 0.28);
+  border-top-color: #3b82f6;
+  animation: spin 0.85s linear infinite;
+}
+
+.loader p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 1rem;
+}
+
+.skeleton {
+  width: 100%;
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.skeleton span {
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.12) 0%,
+      rgba(59, 130, 246, 0.28) 50%,
+      rgba(148, 163, 184, 0.12) 100%
+    );
+  background-size: 220% 100%;
+  animation: shimmer 1.25s ease-in-out infinite;
+}
+
+.skeleton span:nth-child(2) {
+  width: 86%;
+  justify-self: center;
+  animation-delay: 0.08s;
+}
+
+.skeleton span:nth-child(3) {
+  width: 64%;
+  justify-self: center;
+  animation-delay: 0.16s;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 180% 0;
+  }
+
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .skeleton span {
+    animation: none;
+  }
+}
