@@ -2,8 +2,10 @@ import Link from "next/link";
 import { auth } from "../auth";
 import { redirect } from "next/navigation";
 import styles from "../styles/Author.module.css";
-import { supabase } from "@/app/lib/supabase";
+import { getSupabaseAdmin } from "@/app/lib/supabaseAdmin";
 import { getSessionAuthorIds, syncAuthorIdentity } from "@/app/lib/authorIdentity";
+import McpTokenManager from "@/app/components/McpTokenManager";
+import { MCP_TOKEN_HASH_VERSION } from "@/app/lib/mcp/mcpTokenSecurity";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,25 @@ interface DraftChapter {
   updated_at: string;
 }
 
+interface McpTokenMetadata {
+  id: string;
+  name: string;
+  token_prefix: string;
+  created_at: string | null;
+  expires_at: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
+}
+
+interface McpAuditLog {
+  id: string;
+  event_type: string;
+  created_at: string;
+  tool_name: string | null;
+  novel_id: string | null;
+  request_origin: string | null;
+}
+
 export default async function AuthorDashboard() {
   // Fetch the user's session
   const session = await auth();
@@ -32,8 +53,9 @@ export default async function AuthorDashboard() {
     redirect("/profile");
   }
 
-  await syncAuthorIdentity(session);
+  const author = await syncAuthorIdentity(session);
   const authorIds = getSessionAuthorIds(session);
+  const supabase = getSupabaseAdmin();
 
   // Fetch novels by THIS author only, and include a count of their chapters
   const { data: authorNovels, error } = await supabase
@@ -60,6 +82,38 @@ export default async function AuthorDashboard() {
     console.error("Error fetching draft chapters:", draftError);
   }
 
+  const { data: mcpTokens, error: mcpTokenError } = authorIds.length > 0
+    ? await supabase
+        .from("mcp_tokens")
+        .select("id, name, token_prefix, created_at, expires_at, last_used_at, revoked_at")
+        .in("author_id", authorIds)
+        .eq("hash_version", MCP_TOKEN_HASH_VERSION)
+        .is("revoked_at", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+    : { data: [], error: null };
+
+  if (mcpTokenError) {
+    console.error("Error fetching MCP token metadata:", mcpTokenError);
+  }
+
+  const activeMcpToken = ((mcpTokens || []) as McpTokenMetadata[])[0] ?? null;
+
+  const { data: mcpAuditLogs, error: mcpAuditError } = authorIds.length > 0
+    ? await supabase
+        .from("mcp_token_audit_logs")
+        .select("id, event_type, created_at, tool_name, novel_id, request_origin")
+        .in("author_id", authorIds)
+        .order("created_at", { ascending: false })
+        .limit(5)
+    : { data: [], error: null };
+
+  if (mcpAuditError) {
+    console.error("Error fetching MCP audit logs:", mcpAuditError);
+  }
+
+  const recentMcpAuditLogs = (mcpAuditLogs || []) as McpAuditLog[];
+
   const draftsByNovel = ((draftChapters || []) as DraftChapter[]).reduce<Record<string, DraftChapter[]>>((drafts, chapter) => {
     drafts[chapter.novel_id] = drafts[chapter.novel_id] || [];
     drafts[chapter.novel_id].push(chapter);
@@ -74,6 +128,12 @@ export default async function AuthorDashboard() {
           Welcome back, {session.user.name}! Manage your stories here.
         </p>
       </header>
+
+      <McpTokenManager
+        canManageToken={Boolean(author)}
+        initialAuditLogs={recentMcpAuditLogs}
+        initialToken={activeMcpToken}
+      />
 
       <div className={styles.actionsHeader}>
         <h2>My Novels</h2>
