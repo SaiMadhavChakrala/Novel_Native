@@ -9,18 +9,10 @@ interface Citation {
   chapter_title: string;
 }
 
-interface ToolTrace {
-  displayName: string;
-  name: string;
-  summary: string;
-}
-
-export default function NovelLoreChat({ novelId, canUseAgent = false }: { novelId: string; canUseAgent?: boolean }) {
+export default function NovelLoreChat({ novelId }: { novelId: string }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [citations, setCitations] = useState<Citation[]>([]);
-  const [tools, setTools] = useState<ToolTrace[]>([]);
-  const [agentMode, setAgentMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const askQuestion = async (e: React.FormEvent) => {
@@ -30,13 +22,12 @@ export default function NovelLoreChat({ novelId, canUseAgent = false }: { novelI
     setLoading(true);
     setAnswer("");
     setCitations([]);
-    setTools([]);
 
     try {
       const res = await fetch("/api/ask-novel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, novelId, mode: canUseAgent && agentMode ? "agent" : "lore" }),
+        body: JSON.stringify({ question, novelId }),
       });
       
       const data = await res.json();
@@ -47,9 +38,6 @@ export default function NovelLoreChat({ novelId, canUseAgent = false }: { novelI
         setAnswer(data.answer);
         if (data.citations) {
           setCitations(data.citations);
-        }
-        if (data.tools) {
-          setTools(data.tools);
         }
       }
     } catch {
@@ -64,25 +52,6 @@ export default function NovelLoreChat({ novelId, canUseAgent = false }: { novelI
       <p className={styles.intro}>
         Forget a character&apos;s name or a piece of lore? Ask the AI to search the chapters available to you.
       </p>
-
-      {canUseAgent && (
-        <div className={styles.modeSwitch} aria-label="Chat mode">
-          <button
-            type="button"
-            className={`${styles.modeButton} ${!agentMode ? styles.modeButtonActive : ""}`}
-            onClick={() => setAgentMode(false)}
-          >
-            Lore Q&amp;A
-          </button>
-          <button
-            type="button"
-            className={`${styles.modeButton} ${agentMode ? styles.modeButtonActive : ""}`}
-            onClick={() => setAgentMode(true)}
-          >
-            Continuity Agent
-          </button>
-        </div>
-      )}
       
       <form onSubmit={askQuestion} className={styles.form}>
         <input 
@@ -97,27 +66,13 @@ export default function NovelLoreChat({ novelId, canUseAgent = false }: { novelI
           disabled={loading || !question.trim()} 
           className={styles.button}
         >
-          {loading ? "Working..." : agentMode && canUseAgent ? "Run" : "Ask"}
+          {loading ? "Searching..." : "Ask"}
         </button>
       </form>
 
       {answer && (
         <div className={styles.answerBox}>
           <p className={styles.answer}>{answer}</p>
-
-          {tools.length > 0 && (
-            <div className={styles.tools}>
-              <p className={styles.toolTitle}>MCP Tools Used</p>
-              <ul className={styles.toolList}>
-                {tools.map((tool) => (
-                  <li key={`${tool.name}-${tool.summary}`}>
-                    <span>{tool.displayName}</span>
-                    <small>{tool.summary}</small>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
           
           {/* Render strict citations */}
           {citations && citations.length > 0 && (

@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { getSupabaseAdmin } from "@/app/lib/supabaseAdmin";
+import { supabase } from "@/app/lib/supabase";
 import styles from "../../styles/NovelDetails.module.css";
 import { notFound } from "next/navigation";
 import NovelLoreChat from "../../components/NovelLoreChat";
 import { auth } from "@/app/auth";
 import { getAccessiblePublishedChapters } from "@/app/lib/userAccess";
-import { getSessionAuthorIds } from "@/app/lib/authorIdentity";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +12,6 @@ export default async function NovelDetails({ params }: { params: Promise<{ id: s
   // 1. Await the dynamic routing params
   const { id } = await params;
   const session = await auth();
-  const supabase = getSupabaseAdmin();
 
   // 2. Fetch the novel AND the associated author's pen name in one query
   const { data: novel, error: novelError } = await supabase
@@ -33,7 +31,6 @@ export default async function NovelDetails({ params }: { params: Promise<{ id: s
 
   const authorName = novel.authors?.pen_name || "Unknown Author";
   const tags = novel.genre && novel.genre.length > 0 ? novel.genre : ["Uncategorized"];
-  const canUseAgent = getSessionAuthorIds(session).includes(novel.author_id);
 
   return (
     <div className={styles.container}>
@@ -97,7 +94,7 @@ export default async function NovelDetails({ params }: { params: Promise<{ id: s
       </div>
 
       {chapters && chapters.length > 0 && (
-        <NovelLoreChat novelId={id} canUseAgent={canUseAgent} />
+        <NovelLoreChat novelId={id} />
       )}
     </div>
   );
